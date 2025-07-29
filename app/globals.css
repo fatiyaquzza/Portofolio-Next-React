@@ -45,6 +45,7 @@
 
 body {
   font-family: "Poppins", Arial, Helvetica, sans-serif;
+  
 }
 
 :root {
@@ -124,3 +125,5 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+
