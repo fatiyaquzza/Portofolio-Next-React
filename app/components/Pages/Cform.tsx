@@ -1,9 +1,47 @@
-import Form from "next/form";
+"use client";
+import React, { useState } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import { useEffect } from "react";
 
 export default function Cform() {
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    const payload = {
+      from_name: formData.get("name"),
+      from_email: formData.get("email"),
+      subject: formData.get("subject"),
+      message: formData.get("message"),
+    };
+
+    try {
+      const res = await fetch("/api/send-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.message);
+      alert("Email berhasil dikirim!");
+      form.reset();
+    } catch (err: any) {
+      alert("Gagal mengirim email: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     AOS.init({
       duration: 800,
@@ -11,23 +49,20 @@ export default function Cform() {
     });
   }, []);
   return (
-    <div className="mx-auto min-h-screen bg-[#131320] flex flex-col">
-      <div
-        id="contact"
-        className="flex-grow flex justify-center items-center px-4"
-      >
-        <div className="flex flex-col lg:flex-row bg-[#1C1C28] p-8 rounded-xl shadow-lg max-w-5xl w-full">
+    <div className="mx-auto min-h-screen bg-[#131320] flex flex-col ">
+      <div id="contact" className="flex-grow flex justify-center items-center">
+        <div className="flex flex-col lg:flex-row bg-[#1C1C28] p-6 sm:p-8 rounded-xl shadow-lg max-w-5xl w-full">
           {/* Left Section: Contact Info */}
-          <div className="lg:w-1/2 pr-0 lg:pr-8 mb-8 lg:mb-0">
-            <h1 className="text-white font-semibold text-5xl mb-4">
+          <div className="lg:w-1/2 pr-0 lg:pr-8 mb-6 lg:mb-0">
+            <h1 className="text-white font-semibold text-3xl sm:text-4xl md:text-5xl mb-4">
               Let's Work <span className="text-[#6184DC]">Together</span>
             </h1>
-            <p className="text-gray-400 mb-8">
+            <p className="text-gray-400 mb-6 text-sm sm:text-base">
               Please feel free to send me a message. I'll get in touch with you
               as soon as possible
             </p>
-            <div className="space-y-4">
-              <div className="flex items-center text-white">
+            <div className="space-y-3">
+              <div className="flex items-center text-white text-sm sm:text-base">
                 <svg
                   width="24"
                   height="24"
@@ -77,10 +112,10 @@ export default function Cform() {
 
           {/* Right Section: Form */}
           <div className="lg:w-1/2 pl-0 lg:pl-8">
-            <Form action="/send-message" className="space-y-4">
-              {/* Name and Email in one row */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Name and Email */}
               <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
-                <div className="flex flex-col w-full sm:w-full">
+                <div className="flex flex-col w-1/2">
                   <label htmlFor="name" className="text-gray-400 mb-1 text-sm">
                     Name
                   </label>
@@ -89,31 +124,11 @@ export default function Cform() {
                     id="name"
                     name="name"
                     required
-                    className="bg-[#2D2D3A] border border-transparent text-white px-4 py-3 rounded focus:outline-none focus:ring-2 focus:ring-[#6010DD] placeholder-gray-500"
+                    className="bg-[#2D2D3A] border border-transparent text-white px-4 py-3 rounded focus:outline-none focus:ring-2 focus:ring-[#6010DD] placeholder-gray-500 text-sm sm:text-base"
                     placeholder="Name"
                   />
                 </div>
-              </div>
-
-              {/* Phone and Subject in one row */}
-              <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
-                <div className="flex flex-col w-full sm:w-1/2">
-                  <label
-                    htmlFor="subject"
-                    className="text-gray-400 mb-1 text-sm"
-                  >
-                    Subject
-                  </label>
-                  <input
-                    type="text"
-                    id="subject"
-                    name="subject"
-                    required
-                    className="bg-[#2D2D3A] border border-transparent text-white px-4 py-3 rounded focus:outline-none focus:ring-2 focus:ring-[#6010DD] placeholder-gray-500"
-                    placeholder="(245) 245 - 1345"
-                  />
-                </div>
-                <div className="flex flex-col w-full sm:w-1/2">
+                <div className="flex flex-col w-1/2">
                   <label htmlFor="email" className="text-gray-400 mb-1 text-sm">
                     Email
                   </label>
@@ -122,10 +137,25 @@ export default function Cform() {
                     id="email"
                     name="email"
                     required
-                    className="bg-[#2D2D3A] border border-transparent text-white px-4 py-3 rounded focus:outline-none focus:ring-2 focus:ring-[#6010DD] placeholder-gray-500"
+                    className="bg-[#2D2D3A] border border-transparent text-white px-4 py-3 rounded focus:outline-none focus:ring-2 focus:ring-[#6010DD] placeholder-gray-500 text-sm sm:text-base"
                     placeholder="contact@email.com"
                   />
                 </div>
+              </div>
+
+              {/* Subject */}
+              <div className="flex flex-col">
+                <label htmlFor="subject" className="text-gray-400 mb-1 text-sm">
+                  Subject
+                </label>
+                <input
+                  type="text"
+                  id="subject"
+                  name="subject"
+                  required
+                  className="bg-[#2D2D3A] border border-transparent text-white px-4 py-3 rounded focus:outline-none focus:ring-2 focus:ring-[#6010DD] placeholder-gray-500 text-sm sm:text-base"
+                  placeholder="Subject"
+                />
               </div>
 
               {/* Message */}
@@ -138,7 +168,7 @@ export default function Cform() {
                   name="message"
                   rows={4}
                   required
-                  className="bg-[#2D2D3A] border border-transparent text-white px-4 py-3 rounded resize-none focus:outline-none focus:ring-2 focus:ring-[#6010DD] placeholder-gray-500"
+                  className="bg-[#2D2D3A] border border-transparent text-white px-4 py-3 rounded resize-none focus:outline-none focus:ring-2 focus:ring-[#6010DD] placeholder-gray-500 text-sm sm:text-base"
                   placeholder="Please write your message..."
                 ></textarea>
               </div>
@@ -146,18 +176,25 @@ export default function Cform() {
               {/* Submit Button */}
               <button
                 type="submit"
-                className="w-full bg-[#2B0780] hover:bg-[#6010DD] text-white font-semibold py-3 px-4 rounded drop-shadow-2xl hover:drop-shadow-sm text-md"
+                disabled={loading}
+                className={`w-full ${
+                  loading
+                    ? "bg-gray-500 cursor-not-allowed"
+                    : "bg-[#2B0780] hover:bg-[#6010DD]"
+                } text-white font-semibold py-3 px-4 rounded drop-shadow-2xl text-sm sm:text-base`}
               >
-                Send message
+                {loading ? "Sending..." : "Send Message"}
               </button>
-            </Form>
+            </form>
           </div>
         </div>
       </div>
       {/* Footer */}
-      <footer className="w-full bg-[#000000] py-3 px-4 flex justify-between items-center text-gray-400 text-sm">
-        <p>© 2025 Fatiya Quzza. All Rights Reserved.</p>
-        <div className="flex space-x-4">
+      <footer className="w-full bg-[#000000] py-3 px-4 flex justify-between items-center text-gray-400 text-sm ">
+        <p className="mb-2 sm:mb-0">
+          © 2025 Fatiya Quzza. All Rights Reserved.
+        </p>
+        <div className="flex space-x-3 sm:space-x-4">
           <a
             href="#"
             className="block p-2 rounded-full border border-gray-400 hover:border-[#6010DD] hover:text-[#6010DD] transition-colors"

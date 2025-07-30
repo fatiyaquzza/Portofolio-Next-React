@@ -82,14 +82,14 @@ const Experience: React.FC = () => {
   return (
     <div id="experience">
       <p
-        className="pt-12 text-gray-200 text-center"
+        className=" pt-12 text-gray-200 text-center text-lg sm:text-xl"
         data-aos="fade-left"
         data-aos-duration={2000}
       >
         Projects Section
       </p>
       <h1
-        className=" text-white font-semibold text-5xl text-center pt-4"
+        className=" text-white font-semibold text-3xl sm:text-4xl md:text-5xl text-center pt-4"
         data-aos="fade-down"
         data-aos-duration={2000}
       >
@@ -97,7 +97,7 @@ const Experience: React.FC = () => {
       </h1>
       <div
         ref={containerRef}
-        className="relative w-full max-w-6xl mx-auto py-16 px-4 sm:px-6 lg:px-8 mt-10"
+        className="relative w-full max-w-6xl mx-auto py-8 sm:py-16 px-4 sm:px-6 lg:px-8 mt-10"
       >
         {/* Purple line - new gradient */}
         <motion.div
@@ -111,34 +111,30 @@ const Experience: React.FC = () => {
           style={{ top: dotTop }}
         />
 
-        <div className="relative space-y-24">
+        <div className="relative space-y-16 sm:space-y-24">
           {experiences.map((exp, index) => (
             <div
               key={exp.id}
-              className="relative flex items-start justify-between w-full"
+              className="relative flex flex-col sm:flex-row items-center sm:items-start justify-between w-full"
             >
               {/* Left side content */}
-              <div className="w-[45%] order-1" data-aos="fade-left">
+              <div className="w-full sm:w-[45%] order-1 sm:order-1" data-aos="fade-left">
                 <div
-                  className={`flex flex-col ${
-                    index % 2 === 0
-                      ? "items-end text-right"
-                      : "items-start text-left"
-                  }`}
+                  className={`flex flex-col ${index % 2 === 0 ? "items-center sm:items-end text-center sm:text-right" : "items-center sm:items-start text-center sm:text-left"}`}
                 >
                   {index % 2 === 0 ? (
                     // First entry: grouped title, company, year, logo on left
-                    <div className="flex flex-col items-end text-right">
-                      <h3 className="font-bold text-gray-100 mb-0 text-xl">
+                    <div className="flex flex-col items-center sm:items-end text-center sm:text-right">
+                      <h3 className="font-bold text-gray-100 mb-0 text-lg sm:text-xl">
                         {exp.title}
                       </h3>
 
-                      <div className="text-gray-100 mb-0 text-2xl">
+                      <div className="text-gray-100 mb-0 text-base sm:text-xl">
                         {exp.company}
                       </div>
 
                       <span
-                        className="text-[#6184DC] mt-1 text-lg"
+                        className="text-[#6184DC] mt-1 text-sm sm:text-lg"
                         style={{ letterSpacing: "0.2em" }}
                       >
                         {exp.year}
@@ -146,37 +142,39 @@ const Experience: React.FC = () => {
                     </div>
                   ) : (
                     // Second entry: description on left
-                    <p className="text-gray-300 text-sm leading-relaxed text-justify">
+                    <p className="text-gray-300 text-sm leading-relaxed text-justify px-4 sm:px-0">
                       {exp.description}
                     </p>
                   )}
                 </div>
               </div>
 
+              {/* Separator for small screens */}
+              <div className="sm:hidden w-1 h-8 bg-gray-700 my-4" />
+
               {/* Right side content */}
-              <div className="w-[45%] order-2" data-aos="fade-right">
+              <div className="w-full sm:w-[45%] order-2 sm:order-2" data-aos="fade-right">
                 <div
-                  className={`flex flex-col items-start text-left
-                }`}
+                  className={`flex flex-col ${index % 2 === 0 ? "items-center sm:items-start text-center sm:text-left" : "items-center sm:items-end text-center sm:text-right"}`}
                 >
                   {index % 2 === 0 ? (
                     // First entry: description on right
-                    <p className="text-gray-300 text-sm leading-relaxed text-justify">
+                    <p className="text-gray-300 text-sm leading-relaxed text-justify px-4 sm:px-0">
                       {exp.description}
                     </p>
                   ) : (
                     // Second entry: grouped title, company, year, logo on right
-                    <div className="flex flex-col items-end text-right">
-                      <h3 className="font-bold text-gray-100 mb-0 text-xl">
+                    <div className="flex flex-col items-center sm:items-end text-center sm:text-right">
+                      <h3 className="font-bold text-gray-100 mb-0 text-lg sm:text-xl">
                         {exp.title}
                       </h3>
 
-                      <div className="text-gray-100 mb-0 text-xl">
+                      <div className="text-gray-100 mb-0 text-base sm:text-xl">
                         {exp.company}
                       </div>
 
                       <span
-                        className="text-[#6184DC] mt-1 text-lg"
+                        className="text-[#6184DC] mt-1 text-sm sm:text-lg"
                         style={{ letterSpacing: "0.2em" }}
                       >
                         {exp.year}

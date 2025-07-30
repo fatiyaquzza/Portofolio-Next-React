@@ -75,18 +75,18 @@ export default function Project() {
     },
   ];
   return (
-    <div id="Project" className="mx-auto min-h-screen bg-[#131320]">
+    <div id="Project" className="mx-auto min-h-screen bg-[#131320] px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
       <h1
-        className="pt-12 pb-4 text-gray-200 text-center"
+        className="pt-12 pb-4 text-gray-200 text-center text-lg sm:text-xl"
         data-aos="fade-left"
         data-aos-duration={2000}
       >
         Projects Section
       </h1>
-      <div className="flex justify-center items-center max-w-screen min-w-screen min-h-screen">
-        <div className="min-w-9/12 ">
+      <div className="flex justify-center items-center w-full min-h-screen">
+        <div className="w-full max-w-7xl">
           <h1
-            className=" text-white font-semibold text-6xl text-center"
+            className="text-white font-semibold text-3xl sm:text-4xl md:text-5xl text-center"
             data-aos="fade-left"
             data-aos-duration={2000}
           >
@@ -94,7 +94,7 @@ export default function Project() {
           </h1>
 
           <div
-            className="mx-auto px-8"
+            className="mx-auto px-0 sm:px-8 mt-8"
             data-aos="fade-right"
             data-aos-duration="3000"
           >
