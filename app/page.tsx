@@ -36,6 +36,9 @@ export default function Home() {
             <a href="#home" className="hover:text-[#6184DC] transition">
               Home
             </a>
+            <a href="#experience" className="hover:text-[#6184DC] transition">
+              Experience
+            </a>
             <a href="#Project" className="hover:text-[#6184DC] transition">
               Project
             </a>

@@ -16,7 +16,6 @@ interface VelocityMapping {
 
 interface ScrollTextItem {
   text: string;
-  href: string;
 }
 
 interface VelocityTextProps {
@@ -150,7 +149,7 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
           href={href}
           target="_blank"
           rel="noopener noreferrer"
-          className={`flex-shrink-0 hover:text-[#6010DD]  transition-colors ${className}`}
+          className={`flex-shrink-0 hover:text-[#2B0780]  transition-colors ${className}`}
           key={i}
           ref={i === 0 ? copyRef : null}
         >
@@ -176,7 +175,7 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
 
   return (
     <section>
-      {texts.map(({ text, href }, index) => (
+      {texts.map(({ text }, index) => (
         <VelocityText
           key={index}
           className={className}
@@ -190,7 +189,6 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
           scrollerClassName={scrollerClassName}
           parallaxStyle={parallaxStyle}
           scrollerStyle={scrollerStyle}
-          href={href}
         >
           {text}&nbsp;
         </VelocityText>

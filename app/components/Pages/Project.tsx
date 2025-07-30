@@ -20,28 +20,28 @@ export default function Project() {
     {
       title: "QFlora",
       image: qflora,
-      link: "#",
+      link: "https://github.com/fatiyaquzza/QFlora",
       tools: "React Native, Expo",
       type: "Mobile App",
     },
     {
       title: "TrashPorter",
       image: tp,
-      link: "#",
+      link: "https://github.com/TrashPorter/TrashPorter",
       tools: "TailwindCSS, Laravel",
       type: "Website",
     },
     {
       title: "DermoAlly",
       image: dermoAlly,
-      link: "#",
+      link: "https://github.com/Dermoally",
       tools: "Kotlin",
       type: "Mobile App",
     },
     {
       title: "Informatics Final Assignment Portfolio",
       image: developDev,
-      link: "#",
+      link: "https://github.com/fatiyaquzza/DevelopDev_final_project",
       tools: "Laravel, TailwindCSS",
       type: "Website",
     },
@@ -55,21 +55,21 @@ export default function Project() {
     {
       title: "Forterzzz",
       image: dermoAlly,
-      link: "#",
+      link: "https://github.com/Forterzzz",
       tools: "ReactJS, TailwindCSS",
       type: "Website",
     },
     {
       title: "LKBH Sata Al-Faqih Website",
       image: developDev,
-      link: "#",
+      link: "https://github.com/fatiyaquzza/Sistem_Informasi_dan_Manajemen_KKP",
       tools: "Laravel, TailwindCSS",
       type: "Website",
     },
     {
       title: "Wedding Invitation",
       image: dermoAlly,
-      link: "#",
+      link: "https://github.com/Forterzzz",
       tools: "Laravel, TailwindCSS",
       type: "Website",
     },
@@ -86,7 +86,7 @@ export default function Project() {
       <div className="flex justify-center items-center max-w-screen min-w-screen min-h-screen">
         <div className="min-w-9/12 ">
           <h1
-            className=" text-white font-semibold text-5xl text-center"
+            className=" text-white font-semibold text-6xl text-center"
             data-aos="fade-left"
             data-aos-duration={2000}
           >

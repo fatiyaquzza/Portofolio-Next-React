@@ -2,8 +2,9 @@
 
 import React, { useRef } from "react";
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
-import Image from "next/image";
-import ScrambledText from "../ScrambledText/ScrambledText";
+import AOS from "aos";
+import "aos/dist/aos.css";
+import { useEffect } from "react";
 
 const experiences = [
   {
@@ -71,99 +72,122 @@ const Experience: React.FC = () => {
 
   const dotTop = useTransform(scaleY, [0, 1], ["0%", "100%"]);
 
+  useEffect(() => {
+    AOS.init({
+      duration: 800,
+      once: true,
+    });
+  }, []);
+
   return (
-    <div
-      ref={containerRef}
-      className="relative w-full max-w-6xl mx-auto py-16 px-4 sm:px-6 lg:px-8 mt-10"
-    >
-      {/* Purple line - new gradient */}
-      <motion.div
-        className="absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-[#20064A] via-[#2B0780] to-[#6311E1] transform -translate-x-1/2"
-        style={{ scaleY: scaleY, transformOrigin: "top" }}
-      />
+    <div id="experience">
+      <p
+        className="pt-12 text-gray-200 text-center"
+        data-aos="fade-left"
+        data-aos-duration={2000}
+      >
+        Projects Section
+      </p>
+      <h1
+        className=" text-white font-semibold text-5xl text-center pt-4"
+        data-aos="fade-down"
+        data-aos-duration={2000}
+      >
+        Experiences
+      </h1>
+      <div
+        ref={containerRef}
+        className="relative w-full max-w-6xl mx-auto py-16 px-4 sm:px-6 lg:px-8 mt-10"
+      >
+        {/* Purple line - new gradient */}
+        <motion.div
+          className="absolute left-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-[#20064A] via-[#2B0780] to-[#6311E1] transform -translate-x-1/2"
+          style={{ scaleY: scaleY, transformOrigin: "top" }}
+        />
 
-      {/* Animated purple dot */}
-      <motion.div
-        className="absolute left-1/2 w-4 h-4 rounded-full bg-[#6311E1] shadow-[0_0_15px_5px_rgba(99,17,225,0.5)] transform -translate-x-1/2"
-        style={{ top: dotTop }}
-      />
+        {/* Animated purple dot */}
+        <motion.div
+          className="absolute left-1/2 w-4 h-4 rounded-full bg-[#6311E1] shadow-[0_0_15px_5px_rgba(99,17,225,0.5)] transform -translate-x-1/2"
+          style={{ top: dotTop }}
+        />
 
-      <div className="relative space-y-24">
-        {experiences.map((exp, index) => (
-          <div
-            key={exp.id}
-            className="relative flex items-start justify-between w-full" // Changed items-center to items-start
-          >
-            {/* Left side content */}
-            <div className="w-[45%] order-1">
-              <div
-                className={`flex flex-col ${
-                  index % 2 === 0
-                    ? "items-end text-right"
-                    : "items-start text-left"
-                }`}
-              >
-                {index % 2 === 0 ? (
-                  // First entry: grouped title, company, year, logo on left
-                  <div className="flex flex-col items-end text-right">
-                    <h3 className="font-bold text-gray-100 mb-0 text-xl">
-                      {exp.title}
-                    </h3>
+        <div className="relative space-y-24">
+          {experiences.map((exp, index) => (
+            <div
+              key={exp.id}
+              className="relative flex items-start justify-between w-full"
+            >
+              {/* Left side content */}
+              <div className="w-[45%] order-1" data-aos="fade-left">
+                <div
+                  className={`flex flex-col ${
+                    index % 2 === 0
+                      ? "items-end text-right"
+                      : "items-start text-left"
+                  }`}
+                >
+                  {index % 2 === 0 ? (
+                    // First entry: grouped title, company, year, logo on left
+                    <div className="flex flex-col items-end text-right">
+                      <h3 className="font-bold text-gray-100 mb-0 text-xl">
+                        {exp.title}
+                      </h3>
 
-                    <div className="text-gray-100 mb-0 text-2xl">
-                      {exp.company}
+                      <div className="text-gray-100 mb-0 text-2xl">
+                        {exp.company}
+                      </div>
+
+                      <span
+                        className="text-[#6184DC] mt-1 text-lg"
+                        style={{ letterSpacing: "0.2em" }}
+                      >
+                        {exp.year}
+                      </span>
                     </div>
+                  ) : (
+                    // Second entry: description on left
+                    <p className="text-gray-300 text-sm leading-relaxed text-justify">
+                      {exp.description}
+                    </p>
+                  )}
+                </div>
+              </div>
 
-                    <span
-                      className="text-[#6184DC] mt-1 text-lg"
-                      style={{ letterSpacing: "0.2em" }}
-                    >
-                      {exp.year}
-                    </span>
-                  </div>
-                ) : (
-                  // Second entry: description on left
-                  <p className="text-gray-300 text-sm leading-relaxed text-justify">
-                    {exp.description}
-                  </p>
-                )}
+              {/* Right side content */}
+              <div className="w-[45%] order-2" data-aos="fade-right">
+                <div
+                  className={`flex flex-col items-start text-left
+                }`}
+                >
+                  {index % 2 === 0 ? (
+                    // First entry: description on right
+                    <p className="text-gray-300 text-sm leading-relaxed text-justify">
+                      {exp.description}
+                    </p>
+                  ) : (
+                    // Second entry: grouped title, company, year, logo on right
+                    <div className="flex flex-col items-end text-right">
+                      <h3 className="font-bold text-gray-100 mb-0 text-xl">
+                        {exp.title}
+                      </h3>
+
+                      <div className="text-gray-100 mb-0 text-xl">
+                        {exp.company}
+                      </div>
+
+                      <span
+                        className="text-[#6184DC] mt-1 text-lg"
+                        style={{ letterSpacing: "0.2em" }}
+                      >
+                        {exp.year}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-
-            {/* Right side content */}
-            <div className="w-[45%] order-2">
-              <div
-                className={`flex flex-col items-start text-left
-                }`}
-              >
-                {index % 2 === 0 ? (
-                  // First entry: description on right
-                  <p className="text-gray-300 text-sm leading-relaxed text-justify">
-                    {exp.description}
-                  </p>
-                ) : (
-                  // Second entry: grouped title, company, year, logo on right
-                  <div className="flex flex-col items-end text-right">
-                    <h3 className="font-bold text-gray-100 mb-0 text-xl">
-                      {exp.title}
-                    </h3>
-
-                    <div className="text-gray-100 mb-0 text-xl">
-                      {exp.company}
-                    </div>
-
-                    <span
-                      className="text-[#6184DC] mt-1 text-lg"
-                      style={{ letterSpacing: "0.2em" }}
-                    >
-                      {exp.year}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
