@@ -1,5 +1,5 @@
 import { cn } from "@/app/components/lib/utils";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion } from "framer-motion";
 
 import { useState } from "react";
 
@@ -11,7 +11,8 @@ export const HoverEffect = ({
     title: string;
     link: string;
     image: string;
-    developer?: string;
+    tools?: string;
+    type: string;
   }[];
   className?: string;
 }) => {
@@ -31,11 +32,13 @@ export const HoverEffect = ({
           className="relative group block p-2 h-full w-full "
           onMouseEnter={() => setHoveredIndex(idx)}
           onMouseLeave={() => setHoveredIndex(null)}
+          target="_blank"
+          rel="noopener noreferrer"
         >
           <AnimatePresence>
             {hoveredIndex === idx && (
               <motion.span
-                className="absolute inset-0 h-full w-full  dark:bg-slate-800/[0.8] block rounded-3xl bg-[#2B3045]"
+                className="absolute inset-0 h-full w-full  dark:bg-slate-800/[0.8] block rounded-3xl bg-[#2B0780]"
                 layoutId="hoverBackground"
                 initial={{ opacity: 0 }}
                 animate={{
@@ -49,16 +52,18 @@ export const HoverEffect = ({
               />
             )}
           </AnimatePresence>
-          <Card>
-            <img
-              src={item.image}
-              alt={item.title}
-              className="w-full min-h-60 object-cover rounded-xl "
-            />
+          <Card
+            title={item.title}
+            image={item.image}
+            tools={item.tools}
+            link={item.link}
+            isHovered={hoveredIndex === idx}
+            type={item.type}
+          >
             <CardTitle>{item.title}</CardTitle>
 
-            {item.developer && (
-              <p className=" text-[#6184DC] text-sm">{item.developer}</p>
+            {item.tools && (
+              <p className=" text-[#6184DC] text-sm">{item.tools}</p>
             )}
           </Card>
         </a>
@@ -70,9 +75,21 @@ export const HoverEffect = ({
 export const Card = ({
   className,
   children,
+  title,
+  image,
+  tools,
+  link,
+  isHovered,
+  type,
 }: {
   className?: string;
   children: React.ReactNode;
+  title: string;
+  image: string;
+  tools?: string;
+  link: string;
+  isHovered: boolean;
+  type: string;
 }) => {
   return (
     <div
@@ -81,6 +98,28 @@ export const Card = ({
         className
       )}
     >
+      <img
+        src={image}
+        alt={title}
+        className={cn(
+          "w-full h-60 object-cover rounded-xl transition-opacity duration-300",
+          isHovered ? "opacity-50" : "opacity-100"
+        )}
+      />
+
+      <AnimatePresence>
+        {isHovered && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl"
+          >
+            <p className="text-white text-2xl font-bold mb-2">{type}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="relative z-50">{children}</div>
     </div>
   );

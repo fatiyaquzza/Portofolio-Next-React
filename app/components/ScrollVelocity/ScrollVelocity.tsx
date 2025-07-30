@@ -150,7 +150,7 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
           href={href}
           target="_blank"
           rel="noopener noreferrer"
-          className={`flex-shrink-0 hover:text-[#6184DC]  transition-colors ${className}`}
+          className={`flex-shrink-0 hover:text-[#6010DD]  transition-colors ${className}`}
           key={i}
           ref={i === 0 ? copyRef : null}
         >

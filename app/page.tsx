@@ -1,10 +1,11 @@
 "use client";
 
 import Awal from "./components/Pages/Awal";
+import Cform from "./components/Pages/Cform";
 import Contact from "./components/Pages/Contact";
+import Experience from "./components/Pages/Experience";
 import Last from "./components/Pages/Last";
 import Project from "./components/Pages/Project";
-
 
 export default function Home() {
   return (
@@ -47,10 +48,13 @@ export default function Home() {
 
       <Awal />
 
+      <Experience />
+
       <Project />
 
       <Contact />
 
+      <Cform />
     </div>
   );
 }

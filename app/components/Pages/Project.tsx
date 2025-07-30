@@ -21,55 +21,63 @@ export default function Project() {
       title: "QFlora",
       image: qflora,
       link: "#",
-      developer: "React Native, Expo",
+      tools: "React Native, Expo",
+      type: "Mobile App",
     },
     {
       title: "TrashPorter",
       image: tp,
       link: "#",
-      developer: "TailwindCSS, Laravel",
+      tools: "TailwindCSS, Laravel",
+      type: "Website",
     },
     {
       title: "DermoAlly",
       image: dermoAlly,
       link: "#",
-      developer: "Kotlin",
+      tools: "Kotlin",
+      type: "Mobile App",
     },
     {
       title: "Informatics Final Assignment Portfolio",
       image: developDev,
       link: "#",
-      developer: "Laravel, TailwindCSS",
+      tools: "Laravel, TailwindCSS",
+      type: "Website",
     },
     {
       title: "Alzheimer's Disease Classification Website",
       image: alz,
       link: "https://alzheimerclassification.streamlit.app/",
-      developer: "Python, Streamlit, TensorFlow",
+      tools: "Python, Streamlit, TensorFlow",
+      type: "Website",
     },
     {
       title: "Forterzzz",
       image: dermoAlly,
       link: "#",
-      developer: "ReactJS, TailwindCSS",
+      tools: "ReactJS, TailwindCSS",
+      type: "Website",
     },
     {
       title: "LKBH Sata Al-Faqih Website",
       image: developDev,
       link: "#",
-      developer: "Laravel, TailwindCSS",
+      tools: "Laravel, TailwindCSS",
+      type: "Website",
     },
     {
       title: "Wedding Invitation",
       image: dermoAlly,
       link: "#",
-      developer: "Laravel, TailwindCSS",
+      tools: "Laravel, TailwindCSS",
+      type: "Website",
     },
   ];
   return (
     <div id="Project" className="mx-auto min-h-screen bg-[#131320]">
       <h1
-        className="pt-10 pb-8 text-white text-center"
+        className="pt-12 pb-4 text-gray-200 text-center"
         data-aos="fade-left"
         data-aos-duration={2000}
       >
