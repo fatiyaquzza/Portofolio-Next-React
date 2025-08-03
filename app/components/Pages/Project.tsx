@@ -1,5 +1,5 @@
 import { HoverEffect } from "../ui/card-hover-effect";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
@@ -74,6 +74,49 @@ export default function Project() {
       type: "Website",
     },
   ];
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [projectsPerPage, setProjectsPerPage] = useState(3);
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+  useEffect(() => {
+    AOS.init({
+      duration: 800,
+      once: true,
+    });
+
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth < 768); // TailwindCSS 'md' breakpoint is 768px
+    };
+
+    handleResize(); // Set initial value
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const indexOfLastProject = currentPage * projectsPerPage;
+  const indexOfFirstProject = indexOfLastProject - projectsPerPage;
+  const currentProjects = isSmallScreen
+    ? projects.slice(indexOfFirstProject, indexOfLastProject)
+    : projects;
+
+  const totalPages = Math.ceil(projects.length / projectsPerPage);
+
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+
+  const nextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const prevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
   return (
     <div id="Project" className="mx-auto min-h-screen bg-[#131320] px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
       <h1
@@ -98,8 +141,40 @@ export default function Project() {
             data-aos="fade-right"
             data-aos-duration="3000"
           >
-            <HoverEffect items={projects} />
+            <HoverEffect items={currentProjects} />
           </div>
+
+          {isSmallScreen && (
+            <div className="flex justify-center items-center pb-10  space-x-2">
+              <button
+                onClick={prevPage}
+                disabled={currentPage === 1}
+                className="px-4 py-2 bg-[#2B0780] text-white rounded-md disabled:opacity-40"
+              >
+                Previous
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button
+                  key={i + 1}
+                  onClick={() => paginate(i + 1)}
+                  className={`px-4 py-2 rounded-md ${
+                    currentPage === i + 1
+                      ? "bg-[#6311E1] text-white"
+                      : "bg-[#2B0780] text-white"
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+              <button
+                onClick={nextPage}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 bg-[#2B0780] text-white rounded-md disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
