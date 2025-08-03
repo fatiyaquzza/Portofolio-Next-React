@@ -4,18 +4,18 @@ import TextType from "../TextType/TextType";
 
 export default function Awal() {
   return (
-    <div className="mx-auto h-screen bg-[#131320] " id="home">
+    <div className="x-auto min-w-screen-xl md:h-screen bg-[#131320] " id="home">
       <div className="grid grid-cols-12 bg-[#131320]">
         <DarkVeil />
-        <div className="col-span-5">
+        <div className="col-span-6 md:col-span-5 pr-10">
           <Lanyard position={[0, 0, 14]} gravity={[0, -90, 0]} />
         </div>
-        <div className="col-span-4 flex justify-center items-center">
+        <div className="col-span-3 md:col-span-4 flex justify-center items-center">
           <div>
-            <h1 className="text-semibold text-white mx-auto text-5xl">
+            <h1 className="text-semibold text-white mx-auto md:text-5xl text-2xl">
               Hi, i am <span className="font-bold">Fatiya Quzza</span>
             </h1>
-            <div className="text-white mt-6 text-lg min-h-14 max-w-[470px]">
+            <div className="text-white mt-6 md:text-lg text-sm min-h-14 max-w-[470px]">
               <TextType
                 text={[
                   "a computer science student with a strong passion for the world of technology,",

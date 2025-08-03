@@ -88,25 +88,6 @@ export default function Cform() {
                 </svg>
                 fatiyaquzzaaa@gmail.com
               </div>
-              {/* <div className="flex items-center text-white">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="text-[#6184DC] mr-3"
-                >
-                  <path
-                    d="M22 16.92V20C22 20.5304 21.7893 21.0391 21.4142 21.4142C21.0391 21.7893 20.5304 22 20 22H4C3.46957 22 2.96086 21.7893 2.58579 21.4142C2.21071 21.0391 2 20.5304 2 20V16.92C2 16.4022 2.15871 15.8956 2.46464 15.4859C2.77057 15.0762 3.19327 14.7818 3.666 14.636L7.334 13.525C7.80775 13.3792 8.28825 13.4862 8.71804 13.8291L11.536 16.035C11.8491 16.2796 12.2343 16.4034 12.625 16.4034C13.0157 16.4034 13.4009 16.2796 13.714 16.035L16.532 13.8291C16.9617 13.4862 17.4422 13.3792 17.916 13.525L21.584 14.636C22.0567 14.7818 22.4794 15.0762 22.7854 15.4859C23.0913 15.8956 23.25 16.4022 23.25 16.92V20Z"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-                (246) 234 - 4643
-              </div> */}
             </div>
           </div>
 
@@ -115,7 +96,7 @@ export default function Cform() {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Name and Email */}
               <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
-                <div className="flex flex-col w-1/2">
+                <div className="flex flex-col w-full sm:w-1/2">
                   <label htmlFor="name" className="text-gray-400 mb-1 text-sm">
                     Name
                   </label>
@@ -124,11 +105,11 @@ export default function Cform() {
                     id="name"
                     name="name"
                     required
-                    className="bg-[#2D2D3A] border border-transparent text-white px-4 py-3 rounded focus:outline-none focus:ring-2 focus:ring-[#6010DD] placeholder-gray-500 text-sm sm:text-base"
+                    className="w-full bg-[#2D2D3A] border border-transparent text-white px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6010DD] placeholder-gray-500 text-sm sm:text-base"
                     placeholder="Name"
                   />
                 </div>
-                <div className="flex flex-col w-1/2">
+                <div className="flex flex-col w-full sm:w-1/2">
                   <label htmlFor="email" className="text-gray-400 mb-1 text-sm">
                     Email
                   </label>
@@ -137,7 +118,7 @@ export default function Cform() {
                     id="email"
                     name="email"
                     required
-                    className="bg-[#2D2D3A] border border-transparent text-white px-4 py-3 rounded focus:outline-none focus:ring-2 focus:ring-[#6010DD] placeholder-gray-500 text-sm sm:text-base"
+                    className="w-full bg-[#2D2D3A] border border-transparent text-white px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6010DD] placeholder-gray-500 text-sm sm:text-base"
                     placeholder="contact@email.com"
                   />
                 </div>
@@ -153,7 +134,7 @@ export default function Cform() {
                   id="subject"
                   name="subject"
                   required
-                  className="bg-[#2D2D3A] border border-transparent text-white px-4 py-3 rounded focus:outline-none focus:ring-2 focus:ring-[#6010DD] placeholder-gray-500 text-sm sm:text-base"
+                  className="w-full bg-[#2D2D3A] border border-transparent text-white px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6010DD] placeholder-gray-500 text-sm sm:text-base"
                   placeholder="Subject"
                 />
               </div>
@@ -168,7 +149,7 @@ export default function Cform() {
                   name="message"
                   rows={4}
                   required
-                  className="bg-[#2D2D3A] border border-transparent text-white px-4 py-3 rounded resize-none focus:outline-none focus:ring-2 focus:ring-[#6010DD] placeholder-gray-500 text-sm sm:text-base"
+                  className="w-full bg-[#2D2D3A] border border-transparent text-white px-4 py-3 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-[#6010DD] placeholder-gray-500 text-sm sm:text-base"
                   placeholder="Please write your message..."
                 ></textarea>
               </div>
@@ -181,7 +162,7 @@ export default function Cform() {
                   loading
                     ? "bg-gray-500 cursor-not-allowed"
                     : "bg-[#2B0780] hover:bg-[#6010DD]"
-                } text-white font-semibold py-3 px-4 rounded drop-shadow-2xl text-sm sm:text-base`}
+                } text-white font-semibold py-3 px-4 rounded-md drop-shadow-2xl text-sm sm:text-base`}
               >
                 {loading ? "Sending..." : "Send Message"}
               </button>
