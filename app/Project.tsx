@@ -1,4 +1,4 @@
-import { HoverEffect } from "../ui/card-hover-effect";
+import { HoverEffect } from "./components/ui/card-hover-effect";
 import { useEffect, useState } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -15,6 +15,8 @@ export default function Project() {
   const tp = "/assets/images/tp.png";
   const dermoAlly = "/assets/images/dermoAlly.png";
   const alz = "/assets/images/alz.png";
+  const forterz = "/assets/images/forterz.png";
+  const wedding = "/assets/images/wedding.png";
 
   const projects = [
     {
@@ -54,7 +56,7 @@ export default function Project() {
     },
     {
       title: "Forterzzz",
-      image: dermoAlly,
+      image: forterz,
       link: "https://github.com/Forterzzz",
       tools: "ReactJS, TailwindCSS",
       type: "Website",
@@ -68,7 +70,7 @@ export default function Project() {
     },
     {
       title: "Wedding Invitation",
-      image: dermoAlly,
+      image: wedding,
       link: "https://github.com/Forterzzz",
       tools: "Laravel, TailwindCSS",
       type: "Website",
@@ -86,7 +88,7 @@ export default function Project() {
     });
 
     const handleResize = () => {
-      setIsSmallScreen(window.innerWidth < 768); // TailwindCSS 'md' breakpoint is 768px
+      setIsSmallScreen(window.innerWidth < 768);
     };
 
     handleResize(); // Set initial value
@@ -118,7 +120,10 @@ export default function Project() {
   };
 
   return (
-    <div id="Project" className="mx-auto min-h-screen bg-[#131320] px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
+    <div
+      id="Project"
+      className="mx-auto min-h-screen bg-[#131320] px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16"
+    >
       <h1
         className="pt-12 pb-4 text-gray-200 text-center text-lg sm:text-xl"
         data-aos="fade-left"

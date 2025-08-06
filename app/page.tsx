@@ -1,19 +1,30 @@
 "use client";
 
-import Awal from "./components/Pages/Awal";
-import Cform from "./components/Pages/Cform";
-import Contact from "./components/Pages/Contact";
-import Experience from "./components/Pages/Experience";
-import Last from "./components/Pages/Last";
-import Project from "./components/Pages/Project";
-import { useState } from "react";
+import Awal from "./Awal";
+import Cform from "./Cform";
+import Contact from "./Contact";
+import Experience from "./Experience";
+import Project from "./Project";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showTopBtn, setShowTopBtn] = useState(false);
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowTopBtn(window.scrollY > 300);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const handleScrollTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
   return (
     <div className="min-h-[200vh] overflow-x-hidden bg-[#131320] scroll-smooth ">
       <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[999] w-full px-4">
@@ -55,7 +66,10 @@ export default function Home() {
 
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center">
-            <button onClick={toggleMenu} className="text-white focus:outline-none">
+            <button
+              onClick={toggleMenu}
+              className="text-white focus:outline-none"
+            >
               <svg
                 className="w-6 h-6"
                 fill="none"
@@ -86,16 +100,32 @@ export default function Home() {
         {/* Mobile Menu Content */}
         {isMenuOpen && (
           <div className="md:hidden bg-white/5 backdrop-blur-lg border border-white/10 rounded-md mt-2 py-2 px-4 space-y-2 text-white text-sm font-medium">
-            <a href="#home" className="block hover:text-[#6184DC] transition" onClick={toggleMenu}>
+            <a
+              href="#home"
+              className="block hover:text-[#6184DC] transition"
+              onClick={toggleMenu}
+            >
               Home
             </a>
-            <a href="#experience" className="block hover:text-[#6184DC] transition" onClick={toggleMenu}>
+            <a
+              href="#experience"
+              className="block hover:text-[#6184DC] transition"
+              onClick={toggleMenu}
+            >
               Experience
             </a>
-            <a href="#Project" className="block hover:text-[#6184DC] transition" onClick={toggleMenu}>
+            <a
+              href="#Project"
+              className="block hover:text-[#6184DC] transition"
+              onClick={toggleMenu}
+            >
               Project
             </a>
-            <a href="#contact" className="block hover:text-[#6184DC] transition" onClick={toggleMenu}>
+            <a
+              href="#contact"
+              className="block hover:text-[#6184DC] transition"
+              onClick={toggleMenu}
+            >
               Contact
             </a>
           </div>
@@ -111,6 +141,28 @@ export default function Home() {
       <Contact />
 
       <Cform />
+
+      {showTopBtn && (
+        <button
+          onClick={handleScrollTop}
+          className="fixed bottom-16 right-6 z-[1000] bg-[#6311E1] to-[#2B0780] transform -translate-x-1/2 hover:bg-[#2B0780] text-white p-3 rounded-full shadow-lg transition-all duration-300"
+          aria-label="Scroll to top"
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M5 15l7-7 7 7"
+            />
+          </svg>
+        </button>
+      )}
     </div>
   );
 }

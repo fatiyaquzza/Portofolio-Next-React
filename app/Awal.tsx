@@ -1,6 +1,6 @@
-import DarkVeil from "../DarkVeil/DarkVeil";
-import Lanyard from "../Lanyard/Lanyard";
-import TextType from "../TextType/TextType";
+import DarkVeil from "./components/DarkVeil/DarkVeil";
+import Lanyard from "./components/Lanyard/Lanyard";
+import TextType from "./components/TextType/TextType";
 
 export default function Awal() {
   return (
