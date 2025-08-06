@@ -71,7 +71,7 @@ export default function Project() {
     {
       title: "Wedding Invitation",
       image: wedding,
-      link: "https://github.com/Forterzzz",
+      link: "#",
       tools: "Laravel, TailwindCSS",
       type: "Website",
     },
