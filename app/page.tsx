@@ -145,7 +145,7 @@ export default function Home() {
       {showTopBtn && (
         <button
           onClick={handleScrollTop}
-          className="fixed bottom-16 right-6 z-[1000] bg-[#6311E1] to-[#2B0780] transform -translate-x-1/2 hover:bg-[#2B0780] text-white p-3 rounded-full shadow-lg transition-all duration-300"
+          className="fixed bottom-16 right-6 z-[1000] bg-[#6311E1] to-[#2B0780] transform -translate-x-1/2 hover:bg-[#2B0780] text-white p-3 rounded-full shadow-lg transition-all duration-300 animate-bounce"
           aria-label="Scroll to top"
         >
           <svg
