@@ -17,6 +17,8 @@ export default function Project() {
   const alz = "/assets/images/alz.png";
   const forterz = "/assets/images/forterz.png";
   const wedding = "/assets/images/wedding.png";
+  const lkbh = "/assets/images/lkbh.png";
+
 
   const projects = [
     {
@@ -63,7 +65,7 @@ export default function Project() {
     },
     {
       title: "LKBH Sata Al-Faqih Website",
-      image: developDev,
+      image: lkbh,
       link: "https://github.com/fatiyaquzza/Sistem_Informasi_dan_Manajemen_KKP",
       tools: "Laravel, TailwindCSS",
       type: "Website",
