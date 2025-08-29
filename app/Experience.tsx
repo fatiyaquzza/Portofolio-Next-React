@@ -14,7 +14,7 @@ type ExperienceItem = {
   company: string;
   year: string;
   description: string;
-  order?: number; // opsional
+  order?: number; 
 };
 
 const Experience: React.FC = () => {
