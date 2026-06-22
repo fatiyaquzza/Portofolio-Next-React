@@ -5,6 +5,7 @@ import Cform from "./Cform";
 import Contact from "./Contact";
 import Experience from "./Experience";
 import Project from "./Project";
+import TechStack from "./TechStack";
 import { useEffect, useState } from "react";
 
 export default function Home() {
@@ -55,6 +56,9 @@ export default function Home() {
             </a>
             <a href="#experience" className="hover:text-[#6184DC] transition">
               Experience
+            </a>
+            <a href="#skills" className="hover:text-[#6184DC] transition">
+              Skills
             </a>
             <a href="#Project" className="hover:text-[#6184DC] transition">
               Project
@@ -115,6 +119,13 @@ export default function Home() {
               Experience
             </a>
             <a
+              href="#skills"
+              className="block hover:text-[#6184DC] transition"
+              onClick={toggleMenu}
+            >
+              Skills
+            </a>
+            <a
               href="#Project"
               className="block hover:text-[#6184DC] transition"
               onClick={toggleMenu}
@@ -133,6 +144,8 @@ export default function Home() {
       </div>
 
       <Awal />
+
+      <TechStack />
 
       <Experience />
 

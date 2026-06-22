@@ -1,37 +1,67 @@
 import DarkVeil from "./components/DarkVeil/DarkVeil";
 import Lanyard from "./components/Lanyard/Lanyard";
 import TextType from "./components/TextType/TextType";
+import { Download } from "lucide-react";
 
 export default function Awal() {
   return (
-    <div className="x-auto min-w-screen-xl md:h-screen bg-[#131320] " id="home">
-      <div className="grid grid-cols-12 bg-[#131320]">
+    <section
+      className="relative min-h-[100svh] overflow-hidden bg-[#131320] md:h-screen"
+      id="home"
+    >
+      <div className="absolute inset-0">
         <DarkVeil />
-        <div className="col-span-6 md:col-span-5 pr-10">
+      </div>
+      <div className="relative z-10 grid min-h-[100svh] grid-cols-1 grid-rows-[42svh_1fr] items-center bg-transparent px-5 pb-8 pt-24 sm:grid-rows-[46svh_1fr] sm:px-8 md:h-full md:min-h-0 md:grid-cols-12 md:grid-rows-1 md:px-0 md:py-0">
+        <div className="relative h-full min-h-0 md:col-span-5 md:pr-10">
           <Lanyard position={[0, 0, 14]} gravity={[0, -90, 0]} />
         </div>
-        <div className="col-span-3 md:col-span-4 flex justify-center items-center">
-          <div>
-            <h1 className="text-semibold text-white mx-auto md:text-5xl text-2xl">
-              Hi, i am <span className="font-bold">Fatiya Quzza</span>
+        <div className="relative flex min-h-0 items-center md:col-span-6 md:px-0">
+          <div className="mx-auto w-full max-w-2xl md:mx-0">
+            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#7F6DFF] sm:mb-4 sm:text-xs md:mb-5">
+              Available for freelance
+            </p>
+            <h1 className="max-w-[680px] text-balance text-[clamp(2rem,8vw,2.75rem)] font-bold leading-tight text-white sm:text-5xl md:text-5xl">
+              Hi, I am{" "}
+              <span className="bg-gradient-to-r from-[#7257FF] via-[#8D78FF] to-[#D8D1FF] bg-clip-text text-transparent">
+                Fatiya Quzza
+              </span>
             </h1>
-            <div className="text-white mt-6 md:text-lg text-sm min-h-14 max-w-[470px]">
+            <div className="mt-2 min-h-9 max-w-[620px] text-pretty text-lg font-semibold leading-tight text-[#8F8AA8] sm:mt-3 sm:min-h-10 sm:text-xl md:min-h-12 md:text-2xl">
               <TextType
                 text={[
-                  "a computer science student with a strong passion for the world of technology,",
-                  "specializing in mobile and web development.",
+                  "Web Developer",
+                  "Fullstack Developer",
+                  "Mobile & Web Developer",
                 ]}
                 typingSpeed={60}
                 pauseDuration={700}
                 showCursor={true}
                 cursorCharacter="|"
+                textColors={["#8F8AA8"]}
               />
             </div>
+            <p className="mt-4 max-w-[560px] text-pretty text-xs leading-5 text-gray-100 sm:text-sm sm:leading-6 md:mt-5">
+              Architecting seamless digital experiences with a focus on clean
+              code, user-friendly interfaces, and reliable functionality.
+              Transforming ideas into elegant mobile and web solutions.
+            </p>
 
-            <div className="mt-8 flex items-center justify-end ">
+            <div className="mt-5 flex sm:mt-6 md:mt-7">
+              <a
+                href="/Fatiya-Quzza-CV.pdf"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-[#2B0780] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#220663] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#6184DC]/30 sm:px-6 sm:py-3"
+              >
+                <Download className="h-4 w-4" />
+                Download CV
+              </a>
+            </div>
+
+            <div className="mt-5 flex items-center sm:mt-6 md:mt-7 md:justify-end">
               <a
                 href="https://www.instagram.com/fatiyaquzza/"
                 target="_blank"
+                rel="noopener noreferrer"
                 className="mr-3 flex h-9 w-9 items-center justify-center rounded-full border border-slate-300 text-white hover:border-primary hover:bg-primary hover:text-[#6184DC]"
               >
                 <svg
@@ -48,6 +78,7 @@ export default function Awal() {
               <a
                 href="https://www.linkedin.com/in/fatiya-quzza-40310921a/"
                 target="_blank"
+                rel="noopener noreferrer"
                 className="mr-3 flex h-9 w-9 items-center justify-center rounded-full border border-slate-300 text-white hover:border-primary hover:bg-primary hover:text-[#6184DC]"
               >
                 <svg
@@ -65,6 +96,7 @@ export default function Awal() {
               <a
                 href="https://github.com/fatiyaquzza"
                 target="_blank"
+                rel="noopener noreferrer"
                 className="mr-3 flex h-9 w-9 items-center justify-center rounded-full border border-slate-300 text-white hover:border-primary hover:bg-primary hover:text-[#6184DC]"
               >
                 <svg
@@ -82,6 +114,6 @@ export default function Awal() {
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

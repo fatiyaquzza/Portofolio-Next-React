@@ -6,6 +6,7 @@ import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { useAuth } from "../../context/AuthContext";
 import { FcGoogle } from "react-icons/fc";
 import { FaSpinner } from "react-icons/fa";
+import { hasAdminAccess } from "@/lib/adminAccess";
 
 /**
  * Catatan: Fungsionalitas TIDAK diubah — hanya styling/markup.
@@ -17,9 +18,20 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (user?.email === "fatiyaquzzaaa@gmail.com") {
-      router.replace("/dashboard");
-    }
+    if (!user) return;
+
+    let cancelled = false;
+
+    (async () => {
+      const isAdmin = await hasAdminAccess(user);
+      if (!cancelled && isAdmin) {
+        router.replace("/dashboard");
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [user, router]);
 
   const handleLogin = async () => {
@@ -28,8 +40,9 @@ export default function LoginPage() {
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: "select_account" });
       const result = await signInWithPopup(auth, provider);
+      const isAdmin = await hasAdminAccess(result.user);
 
-      if (result.user.email !== "fatiyaquzzaaa@gmail.com") {
+      if (!isAdmin) {
         await signOut(auth);
         alert("Hanya akun admin yang diizinkan!");
         return;
@@ -112,8 +125,7 @@ export default function LoginPage() {
 
         {/* footnote mini */}
         <div className="mt-6 text-center text-[11px] text-gray-500">
-          Only for admin:&nbsp;
-          <b className="font-medium text-white">fatiyaquzzaaa@gmail.com</b>
+          Only configured administrator accounts can continue.
         </div>
       </div>
 

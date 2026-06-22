@@ -6,6 +6,7 @@ import { useEffect } from "react";
 
 export default function Cform() {
   const [loading, setLoading] = useState(false);
+  const currentYear = new Date().getFullYear();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,8 +36,9 @@ export default function Cform() {
       if (!res.ok) throw new Error(data.message);
       alert("Email berhasil dikirim!");
       form.reset();
-    } catch (err: any) {
-      alert("Gagal mengirim email: " + err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Something went wrong";
+      alert("Gagal mengirim email: " + message);
     } finally {
       setLoading(false);
     }
@@ -173,11 +175,13 @@ export default function Cform() {
       {/* Footer */}
       <footer className="w-full bg-[#000000] py-3 px-4 flex justify-between items-center text-gray-400 text-sm ">
         <p className="mb-2 sm:mb-0">
-          © 2025 Fatiya Quzza. All Rights Reserved.
+          &copy; {currentYear} Fatiya Quzza. All Rights Reserved.
         </p>
         <div className="flex space-x-3 sm:space-x-4">
           <a
-            href="#"
+            href="https://www.instagram.com/fatiyaquzza/"
+            target="_blank"
+            rel="noopener noreferrer"
             className="block p-2 rounded-full border border-gray-400 hover:border-[#6010DD] hover:text-[#6010DD] transition-colors"
           >
             <svg
@@ -197,7 +201,9 @@ export default function Cform() {
             </svg>
           </a>
           <a
-            href="#"
+            href="https://www.linkedin.com/in/fatiya-quzza-40310921a/"
+            target="_blank"
+            rel="noopener noreferrer"
             className="block p-2 rounded-full border border-gray-400 hover:border-[#6010DD] hover:text-[#6010DD] transition-colors"
           >
             <svg
@@ -217,7 +223,9 @@ export default function Cform() {
             </svg>
           </a>
           <a
-            href="#"
+            href="https://github.com/fatiyaquzza"
+            target="_blank"
+            rel="noopener noreferrer"
             className="block p-2 rounded-full border border-gray-400 hover:border-[#6010DD] hover:text-[#6010DD] transition-colors"
           >
             <svg

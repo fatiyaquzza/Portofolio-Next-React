@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-
-const ADMIN_EMAIL = "fatiyaquzzaaa@gmail.com";
+import { hasAdminAccess } from "@/lib/adminAccess";
 
 export default function ProtectedDashboard({
   children,
@@ -14,30 +13,47 @@ export default function ProtectedDashboard({
   const { user, signOut } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const [checkingAccess, setCheckingAccess] = useState(false);
 
   const isDashboard = pathname?.startsWith("/dashboard");
 
   useEffect(() => {
-    if (!isDashboard) return;            // halaman publik → skip guard
-    if (user === undefined) return;      // masih loading state
-
-    if (!user) {
-      // belum login → lempar ke /login
-      router.replace("/login");
+    if (!isDashboard) {
+      setCheckingAccess(false);
       return;
     }
 
-    if (user.email !== ADMIN_EMAIL) {
-      // login tapi bukan admin → paksa logout lalu ke /login
-      (async () => {
+    if (user === undefined) {
+      setCheckingAccess(true);
+      return;
+    }
+
+    let cancelled = false;
+    setCheckingAccess(true);
+
+    if (!user) {
+      router.replace("/login");
+      setCheckingAccess(false);
+      return undefined;
+    }
+
+    (async () => {
+      const isAdmin = await hasAdminAccess(user);
+      if (!cancelled && !isAdmin) {
         await signOut();
         router.replace("/login");
-      })();
-    }
+      }
+      if (!cancelled) {
+        setCheckingAccess(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [user, isDashboard, router, signOut]);
 
-  // Tahan render konten dashboard saat loading / proses cek
-  if (isDashboard && user === undefined) {
+  if (isDashboard && (user === undefined || checkingAccess)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#0B0F15] text-white">
         Loading...
