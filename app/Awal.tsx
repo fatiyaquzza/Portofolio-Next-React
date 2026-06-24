@@ -1,9 +1,25 @@
+"use client";
+
 import DarkVeil from "./components/DarkVeil/DarkVeil";
 import Lanyard from "./components/Lanyard/Lanyard";
 import TextType from "./components/TextType/TextType";
-import { Download } from "lucide-react";
+import { ChevronDown, Download } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export default function Awal() {
+  const [showScrollHint, setShowScrollHint] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollHint(window.scrollY < 80);
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <section
       className="relative min-h-[100svh] overflow-hidden bg-[#131320] md:h-screen"
@@ -12,11 +28,11 @@ export default function Awal() {
       <div className="absolute inset-0">
         <DarkVeil />
       </div>
-      <div className="relative z-10 grid min-h-[100svh] grid-cols-1 grid-rows-[42svh_1fr] items-center bg-transparent px-5 pb-8 pt-24 sm:grid-rows-[46svh_1fr] sm:px-8 md:h-full md:min-h-0 md:grid-cols-12 md:grid-rows-1 md:px-0 md:py-0">
-        <div className="relative h-full min-h-0 md:col-span-5 md:pr-10">
+      <div className="relative z-10 grid min-h-[100svh] grid-cols-1 grid-rows-[auto_46svh] items-center gap-y-4 bg-transparent px-5 pb-4 pt-28 sm:grid-rows-[auto_50svh] sm:gap-y-6 sm:px-8 md:h-full md:min-h-0 md:grid-cols-12 md:grid-rows-1 md:gap-y-0 md:px-0 md:py-0">
+        <div className="relative order-2 h-full min-h-0 md:order-1 md:col-span-5 md:pr-10">
           <Lanyard position={[0, 0, 14]} gravity={[0, -90, 0]} />
         </div>
-        <div className="relative flex min-h-0 items-center md:col-span-6 md:px-0">
+        <div className="relative order-1 flex min-h-0 items-center md:order-2 md:col-span-6 md:px-0">
           <div className="mx-auto w-full max-w-2xl md:mx-0">
             <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#7F6DFF] sm:mb-4 sm:text-xs md:mb-5">
               Available for freelance
@@ -114,6 +130,22 @@ export default function Awal() {
           </div>
         </div>
       </div>
+
+      <a
+        href="#skills"
+        aria-label="Scroll to skills section"
+        className={`group absolute bottom-5 left-1/2 z-20 hidden -translate-x-1/2 flex-col items-center gap-1 text-[#A9A4BC] transition-all duration-500 ease-out hover:text-white focus:outline-none focus-visible:text-white md:flex motion-reduce:duration-0 ${
+          showScrollHint
+            ? "translate-y-0 opacity-100"
+            : "pointer-events-none translate-y-2 opacity-0"
+        }`}
+      >
+        <span className="text-[10px] font-medium tracking-[0.12em]">
+          Scroll to explore
+        </span>
+        <span className="h-4 w-px bg-current opacity-50 transition-all duration-300 group-hover:h-5" />
+        <ChevronDown className="h-4 w-4 animate-bounce motion-reduce:animate-none" />
+      </a>
     </section>
   );
 }
