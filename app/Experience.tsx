@@ -2,8 +2,6 @@
 
 import React, { useRef, useEffect, useState } from "react";
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
-import AOS from "aos";
-import "aos/dist/aos.css";
 
 import { db } from "@/lib/firebase";
 import { collection, onSnapshot, query } from "firebase/firestore";
@@ -26,10 +24,6 @@ const Experience: React.FC = () => {
 
   const [experiences, setExperiences] = useState<ExperienceItem[]>([]);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    AOS.init({ duration: 800, once: true });
-  }, []);
 
   useEffect(() => {
     // TANPA orderBy

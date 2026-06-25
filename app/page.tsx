@@ -1,11 +1,12 @@
 "use client";
 
-import Awal from "./Awal";
 import Cform from "./Cform";
 import Contact from "./Contact";
 import Experience from "./Experience";
+import HomeAboutTransition from "./HomeAboutTransition";
 import Project from "./Project";
 import TechStack from "./TechStack";
+import AosInitializer from "./components/AosInitializer";
 import { useEffect, useState } from "react";
 
 export default function Home() {
@@ -27,7 +28,8 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-[200vh] overflow-x-hidden bg-[#131320] scroll-smooth ">
+    <div className="min-h-[200vh] overflow-x-clip bg-[#131320] scroll-smooth">
+      <AosInitializer />
       <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[999] w-full px-4">
         <div className="backdrop-blur-lg bg-white/5 border border-white/10 px-8 py-3 rounded-full flex items-center justify-between max-w-screen-lg mx-auto">
           {/* Left: Logo */}
@@ -53,6 +55,9 @@ export default function Home() {
           <div className="hidden md:flex gap-6 text-white text-sm font-medium">
             <a href="#home" className="hover:text-[#6184DC] transition">
               Home
+            </a>
+            <a href="#about" className="hover:text-[#6184DC] transition">
+              About
             </a>
             <a href="#experience" className="hover:text-[#6184DC] transition">
               Experience
@@ -112,6 +117,13 @@ export default function Home() {
               Home
             </a>
             <a
+              href="#about"
+              className="block hover:text-[#6184DC] transition"
+              onClick={toggleMenu}
+            >
+              About
+            </a>
+            <a
               href="#experience"
               className="block hover:text-[#6184DC] transition"
               onClick={toggleMenu}
@@ -143,7 +155,7 @@ export default function Home() {
         )}
       </div>
 
-      <Awal />
+      <HomeAboutTransition />
 
       <TechStack />
 

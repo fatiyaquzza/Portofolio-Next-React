@@ -1,8 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { HoverEffect } from "./components/ui/card-hover-effect";
-import AOS from "aos";
-import "aos/dist/aos.css";
 import { getProjects, ProjectDoc } from "../lib/firestoreCrud";
 
 export default function Project() {
@@ -13,7 +11,6 @@ export default function Project() {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
 
   useEffect(() => {
-    AOS.init({ duration: 800, once: true });
     const handleResize = () => setIsSmallScreen(window.innerWidth < 768);
     handleResize();
     window.addEventListener("resize", handleResize);

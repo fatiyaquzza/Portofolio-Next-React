@@ -1,8 +1,5 @@
 "use client";
 import React, { useState } from "react";
-import AOS from "aos";
-import "aos/dist/aos.css";
-import { useEffect } from "react";
 
 export default function Cform() {
   const [loading, setLoading] = useState(false);
@@ -44,12 +41,6 @@ export default function Cform() {
     }
   };
 
-  useEffect(() => {
-    AOS.init({
-      duration: 800,
-      once: true,
-    });
-  }, []);
   return (
     <div className="mx-auto min-h-screen bg-[#131320] flex flex-col ">
       <div id="contact" className="flex-grow flex justify-center items-center">
