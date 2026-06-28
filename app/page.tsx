@@ -65,7 +65,7 @@ export default function Home() {
             <a href="#skills" className="hover:text-[#6184DC] transition">
               Skills
             </a>
-            <a href="#Project" className="hover:text-[#6184DC] transition">
+            <a href="#project" className="hover:text-[#6184DC] transition">
               Project
             </a>
             <a href="#contact" className="hover:text-[#6184DC] transition">
@@ -138,7 +138,7 @@ export default function Home() {
               Skills
             </a>
             <a
-              href="#Project"
+              href="#project"
               className="block hover:text-[#6184DC] transition"
               onClick={toggleMenu}
             >

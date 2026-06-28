@@ -92,7 +92,7 @@ const Experience: React.FC = () => {
             Experience
           </p>
           <h2 className="mx-auto mt-5 max-w-4xl text-balance text-[clamp(2.35rem,5.2vw,5.2rem)] font-semibold leading-[0.96] tracking-[-0.06em] text-white">
-            Chapters that shaped how I build.
+            Chapters of Growth &amp; Creation
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-pretty text-sm leading-7 text-[#8E899E]">
             A focused look at the work, study, and environments that built my

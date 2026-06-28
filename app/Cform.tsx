@@ -192,7 +192,7 @@ export default function Cform() {
             </svg>
           </a>
           <a
-            href="https://www.linkedin.com/in/fatiya-quzza-40310921a/"
+            href="https://www.linkedin.com/in/fatiya-quzza"
             target="_blank"
             rel="noopener noreferrer"
             className="block p-2 rounded-full border border-gray-400 hover:border-[#6010DD] hover:text-[#6010DD] transition-colors"

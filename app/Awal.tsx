@@ -102,7 +102,7 @@ export default function Awal() {
                 </svg>
               </a>
               <a
-                href="https://www.linkedin.com/in/fatiya-quzza-40310921a/"
+                href="https://www.linkedin.com/in/fatiya-quzza"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn"
