@@ -5,6 +5,7 @@ import Contact from "./Contact";
 import Experience from "./Experience";
 import HomeAboutTransition from "./HomeAboutTransition";
 import Project from "./Project";
+import SplashScreen from "./SplashScreen";
 import TechStack from "./TechStack";
 import AosInitializer from "./components/AosInitializer";
 import { useEffect, useState } from "react";
@@ -29,6 +30,7 @@ export default function Home() {
 
   return (
     <div className="min-h-[200vh] overflow-x-clip bg-[#131320] scroll-smooth">
+      <SplashScreen />
       <AosInitializer />
       <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[999] w-full px-4">
         <div className="backdrop-blur-lg bg-white/5 border border-white/10 px-8 py-3 rounded-full flex items-center justify-between max-w-screen-lg mx-auto">
