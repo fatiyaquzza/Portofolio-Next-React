@@ -157,9 +157,9 @@ export default function Home() {
 
       <HomeAboutTransition />
 
-      <TechStack />
-
       <Experience />
+
+      <TechStack />
 
       <Project />
 

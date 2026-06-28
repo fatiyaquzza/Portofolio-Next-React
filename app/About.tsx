@@ -1,10 +1,7 @@
 import {
-  IconArrowsJoin,
-  IconBulb,
-  IconLayersLinked,
   IconMapPin,
-  IconRefresh,
   IconSchool,
+  IconSparkles,
 } from "@tabler/icons-react";
 
 const facts = [
@@ -29,22 +26,18 @@ const workTraits = [
   {
     title: "End-to-end ownership",
     description: "From first idea to a working product",
-    Icon: IconLayersLinked,
   },
   {
     title: "Practical problem solving",
     description: "Clear solutions for real user needs",
-    Icon: IconBulb,
   },
   {
     title: "Independent and collaborative",
     description: "Comfortable owning work and building with a team",
-    Icon: IconArrowsJoin,
   },
   {
     title: "Continuous learner",
     description: "Curious, adaptable, and always improving",
-    Icon: IconRefresh,
   },
 ];
 
@@ -117,13 +110,17 @@ export default function About() {
             data-aos="fade-left"
             data-aos-duration="850"
             data-aos-delay="100"
-            className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.045] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_24px_80px_rgba(19,8,55,0.18)] backdrop-blur-xl sm:p-8 lg:col-span-5"
+            className="relative overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.045] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_24px_80px_rgba(19,8,55,0.18)] backdrop-blur-xl sm:p-8 lg:col-span-5"
           >
             <div
               className="pointer-events-none absolute -right-14 -top-20 h-48 w-48 rounded-full bg-[#7257FF]/20 blur-[70px]"
               aria-hidden="true"
             />
             <div className="relative">
+              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] font-medium tracking-[0.12em] text-[#A9A4B7] uppercase">
+                <IconSparkles size={14} stroke={1.7} aria-hidden="true" />
+                Building with intention
+              </div>
               <p className="text-pretty text-lg font-semibold leading-8 text-[#F0EEF6] md:text-xl">
                 I&apos;m Fatiya, an Informatics graduate who turns ideas into
                 dependable web and mobile products.
@@ -141,7 +138,7 @@ export default function About() {
         <div
           data-aos="fade-up"
           data-aos-duration="750"
-          className="mt-16 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.035] backdrop-blur-xl lg:mt-20"
+          className="mt-16 overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.03] backdrop-blur-xl lg:mt-20"
         >
           <div className="flex flex-col border-b border-white/10 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-7">
             <div>
@@ -155,19 +152,17 @@ export default function About() {
             <span className="mt-4 h-px w-16 bg-gradient-to-r from-[#8D78FF] to-transparent sm:mt-0" />
           </div>
 
-          <div className="grid sm:grid-cols-2 xl:grid-cols-4">
-            {workTraits.map(({ title, description, Icon }, index) => (
+          <div className="grid md:grid-cols-2 lg:grid-cols-4">
+            {workTraits.map(({ title, description }, index) => (
               <div
                 key={title}
                 data-aos="fade-up"
                 data-aos-duration="700"
                 data-aos-delay={index * 80}
-                className="relative border-b border-white/10 px-5 py-6 last:border-b-0 sm:px-7 sm:[&:nth-child(3)]:border-b-0 xl:border-b-0 xl:border-r xl:last:border-r-0"
+                className="relative border-b border-white/10 px-5 py-6 last:border-b-0 md:px-7 md:[&:nth-child(3)]:border-b-0 lg:border-b-0 lg:border-r lg:last:border-r-0"
               >
                 <div className="flex items-start gap-4">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-[#7257FF]/10 text-[#A999FF]">
-                    <Icon size={18} stroke={1.6} aria-hidden="true" />
-                  </span>
+                  <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-[#8D78FF] shadow-[0_0_14px_rgba(141,120,255,0.65)]" />
                   <div>
                     <p className="text-sm font-semibold leading-5 text-[#F0EEF6]">
                       {title}
@@ -200,27 +195,27 @@ export default function About() {
             <span className="h-px flex-1 bg-white/10" />
           </div>
 
-          <dl className="grid border-y border-white/10 sm:grid-cols-3">
+          <dl className="overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.025] sm:grid sm:grid-cols-3">
             {facts.map((fact, index) => (
-            <div
-              key={fact.label}
-              data-aos="fade-up"
-              data-aos-duration="750"
-              data-aos-delay={index * 100}
-              className="relative border-b border-white/10 py-7 last:border-b-0 sm:border-b-0 sm:border-r sm:px-7 sm:last:border-r-0 sm:first:pl-0 lg:py-9"
-            >
-              <dt className="text-sm font-semibold text-[#D8D5E1]">
-                {fact.label}
-              </dt>
-              <dd className="mt-5">
-                <span className="block text-4xl font-semibold tracking-[-0.045em] text-white md:text-5xl">
-                  {fact.value}
-                </span>
-                <span className="mt-2 block max-w-[15rem] text-xs leading-5 text-[#858091]">
-                  {fact.note}
-                </span>
-              </dd>
-            </div>
+              <div
+                key={fact.label}
+                data-aos="fade-up"
+                data-aos-duration="750"
+                data-aos-delay={index * 100}
+                className="relative border-b border-white/10 px-5 py-6 last:border-b-0 sm:min-h-[176px] sm:border-b-0 sm:border-r sm:px-7 sm:last:border-r-0 lg:py-8"
+              >
+                <dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8F8AA0]">
+                  {fact.label}
+                </dt>
+                <dd className="mt-4">
+                  <span className="block text-4xl font-semibold tracking-[-0.045em] text-white md:text-[2.75rem]">
+                    {fact.value}
+                  </span>
+                  <span className="mt-3 block max-w-[15rem] text-sm leading-6 text-[#A09BAD]">
+                    {fact.note}
+                  </span>
+                </dd>
+              </div>
             ))}
           </dl>
         </div>
