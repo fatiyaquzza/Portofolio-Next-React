@@ -145,8 +145,8 @@ export default function Awal() {
       </div>
 
       <a
-        href="#skills"
-        aria-label="Scroll to skills section"
+        href="#about"
+        aria-label="Scroll to about section"
         className={`group absolute bottom-5 left-1/2 z-20 hidden -translate-x-1/2 flex-col items-center gap-1 text-[#A9A4BC] transition-all duration-500 ease-out hover:text-white focus:outline-none focus-visible:text-white md:flex motion-reduce:duration-0 ${
           showScrollHint
             ? "translate-y-0 opacity-100"
