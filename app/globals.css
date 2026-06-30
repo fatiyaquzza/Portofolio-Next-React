@@ -47,6 +47,21 @@ body {
   font-family: var(--font-poppins), Arial, Helvetica, sans-serif;
 }
 
+@keyframes terminal-cursor-blink {
+  0%,
+  46% {
+    opacity: 1;
+  }
+  47%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.terminal-cursor-blink {
+  animation: terminal-cursor-blink 1s steps(1, end) infinite;
+}
+
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -124,4 +139,3 @@ body {
     @apply bg-background text-foreground;
   }
 }
-

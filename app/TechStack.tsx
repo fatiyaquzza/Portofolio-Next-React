@@ -4,34 +4,21 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
-  SiCloudinary,
   SiCss3,
-  SiDocker,
   SiExpress,
   SiFirebase,
-  SiFigma,
-  SiFramer,
-  SiGit,
-  SiGithub,
-  SiGreensock,
   SiHtml5,
   SiJavascript,
   SiMongodb,
   SiMysql,
-  SiNetlify,
   SiNextdotjs,
   SiNodedotjs,
-  SiPostgresql,
   SiPostman,
   SiPrisma,
   SiReact,
-  SiRedux,
   SiSupabase,
   SiTailwindcss,
-  SiThreedotjs,
   SiTypescript,
-  SiVercel,
-  SiVite,
 } from "react-icons/si";
 import type { IconType } from "react-icons";
 
@@ -39,85 +26,125 @@ type StackItem = {
   name: string;
   Icon: IconType;
   color: string;
-  featured?: boolean;
+  tone: string;
 };
 
 type StackGroup = {
   title: string;
-  note: string;
-  placement: string;
+  path: string;
+  command: string;
   items: StackItem[];
 };
-
-const stackHighlights = [
-  { value: "28", label: "Tools" },
-  { value: "3", label: "Focus lanes" },
-  { value: "GSAP", label: "Motion layer" },
-];
 
 const stackGroups: StackGroup[] = [
   {
     title: "Frontend",
-    note: "UI Layer",
-    placement: "lg:right-0 lg:top-0 lg:w-[42rem]",
+    path: "~/skills/frontend",
+    command: "ls -la ui-layer",
     items: [
-      { name: "HTML5", Icon: SiHtml5, color: "#E34F26" },
-      { name: "CSS3", Icon: SiCss3, color: "#1572B6" },
+      {
+        name: "HTML",
+        Icon: SiHtml5,
+        color: "#E34F26",
+        tone: "text-[#FF8A5B]",
+      },
+      {
+        name: "CSS",
+        Icon: SiCss3,
+        color: "#1572B6",
+        tone: "text-[#78A8FF]",
+      },
       {
         name: "JavaScript",
         Icon: SiJavascript,
         color: "#F7DF1E",
-        featured: true,
+        tone: "text-[#FFE66D]",
       },
-      { name: "React", Icon: SiReact, color: "#61DAFB", featured: true },
-      { name: "Next.js", Icon: SiNextdotjs, color: "#F8FAFC", featured: true },
+      {
+        name: "React",
+        Icon: SiReact,
+        color: "#61DAFB",
+        tone: "text-[#74E0FF]",
+      },
+      {
+        name: "Next.js",
+        Icon: SiNextdotjs,
+        color: "#F8FAFC",
+        tone: "text-[#F8FAFC]",
+      },
       {
         name: "TypeScript",
         Icon: SiTypescript,
         color: "#3178C6",
-        featured: true,
+        tone: "text-[#77B7FF]",
       },
-      { name: "Tailwind CSS", Icon: SiTailwindcss, color: "#38BDF8" },
-      { name: "Redux", Icon: SiRedux, color: "#764ABC" },
-      { name: "Vite", Icon: SiVite, color: "#B469FF" },
+      {
+        name: "Tailwind CSS",
+        Icon: SiTailwindcss,
+        color: "#38BDF8",
+        tone: "text-[#64D8FF]",
+      },
+      {
+        name: "React Bits",
+        Icon: SiReact,
+        color: "#8D78FF",
+        tone: "text-[#B9AEFF]",
+      },
     ],
   },
   {
     title: "Backend & Data",
-    note: "Core Logic",
-    placement: "lg:bottom-4 lg:left-0 lg:w-[40rem]",
-    items: [
-      { name: "Node.js", Icon: SiNodedotjs, color: "#5FA04E", featured: true },
-      { name: "Express.js", Icon: SiExpress, color: "#F8FAFC" },
-      { name: "Firebase", Icon: SiFirebase, color: "#FFCA28", featured: true },
-      { name: "Supabase", Icon: SiSupabase, color: "#3ECF8E", featured: true },
-      { name: "Prisma", Icon: SiPrisma, color: "#F8FAFC" },
-      { name: "PostgreSQL", Icon: SiPostgresql, color: "#4169E1" },
-      { name: "MongoDB", Icon: SiMongodb, color: "#47A248" },
-      { name: "MySQL", Icon: SiMysql, color: "#4479A1" },
-      { name: "Cloudinary", Icon: SiCloudinary, color: "#3448C5" },
-      { name: "Postman", Icon: SiPostman, color: "#FF6C37" },
-    ],
-  },
-  {
-    title: "Motion & Deploy",
-    note: "Ship Flow",
-    placement: "lg:bottom-0 lg:right-4 lg:w-[36rem]",
+    path: "~/skills/backend-data",
+    command: "tree api-and-storage",
     items: [
       {
-        name: "Framer Motion",
-        Icon: SiFramer,
-        color: "#8AA2FF",
-        featured: true,
+        name: "Node.js",
+        Icon: SiNodedotjs,
+        color: "#5FA04E",
+        tone: "text-[#8FE17F]",
       },
-      { name: "GSAP", Icon: SiGreensock, color: "#88CE02", featured: true },
-      { name: "Three.js", Icon: SiThreedotjs, color: "#F8FAFC", featured: true },
-      { name: "Git", Icon: SiGit, color: "#F05032" },
-      { name: "GitHub", Icon: SiGithub, color: "#F8FAFC" },
-      { name: "Vercel", Icon: SiVercel, color: "#F8FAFC" },
-      { name: "Netlify", Icon: SiNetlify, color: "#00C7B7" },
-      { name: "Docker", Icon: SiDocker, color: "#2496ED" },
-      { name: "Figma", Icon: SiFigma, color: "#F24E1E" },
+      {
+        name: "Express.js",
+        Icon: SiExpress,
+        color: "#F8FAFC",
+        tone: "text-[#E8E2FF]",
+      },
+      {
+        name: "Firebase",
+        Icon: SiFirebase,
+        color: "#FFCA28",
+        tone: "text-[#FFD56A]",
+      },
+      {
+        name: "Supabase",
+        Icon: SiSupabase,
+        color: "#3ECF8E",
+        tone: "text-[#70EABD]",
+      },
+      {
+        name: "Prisma",
+        Icon: SiPrisma,
+        color: "#F8FAFC",
+        tone: "text-[#CFC8FF]",
+      },
+      {
+        name: "MongoDB",
+        Icon: SiMongodb,
+        color: "#47A248",
+        tone: "text-[#72D879]",
+      },
+      {
+        name: "MySQL",
+        Icon: SiMysql,
+        color: "#4479A1",
+        tone: "text-[#80B9E6]",
+      },
+      {
+        name: "Postman",
+        Icon: SiPostman,
+        color: "#FF6C37",
+        tone: "text-[#FF9B76]",
+      },
     ],
   },
 ];
@@ -127,25 +154,33 @@ gsap.registerPlugin(ScrollTrigger);
 export default function TechStack() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const introRef = useRef<HTMLDivElement | null>(null);
-  const overviewRef = useRef<HTMLDivElement | null>(null);
-  const clusterRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const chipRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const blockRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const panelHeaderRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const lineRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const cursorRefs = useRef<(HTMLSpanElement | null)[]>([]);
 
-  clusterRefs.current = [];
-  chipRefs.current = [];
+  blockRefs.current = [];
+  panelHeaderRefs.current = [];
+  lineRefs.current = [];
+  cursorRefs.current = [];
 
   useEffect(() => {
     const section = sectionRef.current;
     const intro = introRef.current;
-    const overview = overviewRef.current;
-    const clusters = clusterRefs.current.filter(
-      (cluster): cluster is HTMLDivElement => cluster !== null
+    const blocks = blockRefs.current.filter(
+      (block): block is HTMLDivElement => block !== null
     );
-    const chips = chipRefs.current.filter(
-      (chip): chip is HTMLDivElement => chip !== null
+    const panelHeaders = panelHeaderRefs.current.filter(
+      (panelHeader): panelHeader is HTMLDivElement => panelHeader !== null
+    );
+    const lines = lineRefs.current.filter(
+      (line): line is HTMLButtonElement => line !== null
+    );
+    const cursors = cursorRefs.current.filter(
+      (cursor): cursor is HTMLSpanElement => cursor !== null
     );
 
-    if (!section || !intro || !overview || clusters.length === 0) {
+    if (!section || !intro || blocks.length === 0) {
       return;
     }
 
@@ -155,90 +190,73 @@ export default function TechStack() {
 
     const ctx = gsap.context(() => {
       if (prefersReducedMotion) {
-        gsap.set([intro, overview, ...clusters, ...chips], {
+        gsap.set([intro, ...panelHeaders, ...lines], {
           clearProps: "all",
-          opacity: 1,
-          scale: 1,
-          x: 0,
+          autoAlpha: 1,
           y: 0,
         });
+        gsap.set(cursors, { display: "none" });
         return;
       }
 
       gsap.set(intro, { opacity: 0, y: 24 });
-      gsap.set(overview, { opacity: 0, x: -24, y: 24 });
-      gsap.set(clusters, { opacity: 0, y: 46, scale: 0.98 });
-      gsap.set(chips, { opacity: 0, y: 16 });
+      gsap.set(panelHeaders, { opacity: 0, y: 8 });
+      gsap.set(lines, { autoAlpha: 0, y: 12 });
+      gsap.set(cursors, { autoAlpha: 0 });
 
-      const reveal = gsap.timeline({
+      gsap.timeline({
         scrollTrigger: {
           trigger: section,
           start: "top 70%",
           once: true,
         },
-      });
-
-      reveal
-        .to(intro, {
+      }).to(intro, {
           opacity: 1,
           y: 0,
           duration: 0.75,
           ease: "power3.out",
-        })
-        .to(
-          overview,
-          {
-            opacity: 1,
-            x: 0,
-            y: 0,
-            duration: 0.75,
-            ease: "power3.out",
+        });
+
+      blocks.forEach((block, groupIndex) => {
+        const panelHeader = panelHeaderRefs.current[groupIndex];
+        const cursor = cursorRefs.current[groupIndex];
+        const blockLines = stackGroups[groupIndex].items
+          .map((_, itemIndex) => lineRefs.current[groupIndex * 16 + itemIndex])
+          .filter((line): line is HTMLButtonElement => line !== null);
+
+        if (!panelHeader || blockLines.length === 0) {
+          return;
+        }
+
+        const reveal = gsap.timeline({
+          scrollTrigger: {
+            trigger: block,
+            start: "top 78%",
+            once: true,
           },
-          "-=0.2"
-        )
-        .to(
-          clusters,
-          {
+        });
+
+        reveal
+          .to(panelHeader, {
             opacity: 1,
             y: 0,
-            scale: 1,
-            duration: 0.8,
-            stagger: 0.16,
-            ease: "power3.out",
-          },
-          "-=0.25"
-        )
-        .to(
-          chips,
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.48,
-            stagger: 0.018,
+            duration: 0.28,
             ease: "power2.out",
-          },
-          "-=0.45"
-        );
+          })
+          .to(blockLines, {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.18,
+            stagger: 0.075,
+            ease: "none",
+            onComplete: () => {
+              gsap.set(blockLines, { clearProps: "opacity,visibility,transform" });
+            },
+          });
 
-      clusters.forEach((cluster, index) => {
-        gsap.to(cluster, {
-          y: index % 2 === 0 ? -8 : 8,
-          duration: 8 + index * 1.4,
-          repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut",
-        });
-      });
-
-      chips.forEach((chip, index) => {
-        gsap.to(chip, {
-          y: index % 2 === 0 ? -4 : 4,
-          x: index % 3 === 0 ? 3 : -2,
-          duration: 4.5 + (index % 6) * 0.32,
-          repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut",
-        });
+        if (cursor) {
+          reveal.set(cursor, { autoAlpha: 1 });
+        }
       });
     }, section);
 
@@ -279,86 +297,75 @@ export default function TechStack() {
           </p>
         </div>
 
-        <div className="relative mt-16 min-h-[50rem] lg:mt-20 lg:min-h-[34rem]">
-          <div
-            ref={overviewRef}
-            className="relative z-10 max-w-[28rem] rounded-[2rem] bg-white/[0.04] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.07),0_24px_70px_rgba(7,5,20,0.22)] backdrop-blur-xl lg:absolute lg:left-0 lg:top-1"
-          >
-            <p className="text-sm font-medium text-[#D8D1FF]">
-              Stack overview
-            </p>
-            <div className="mt-5 flex flex-wrap gap-3">
-              {stackHighlights.map((item) => (
+        <div className="mt-12 space-y-10 lg:mt-16">
+          {stackGroups.map((group, groupIndex) => (
+            <div
+              key={group.title}
+              ref={(node) => {
+                blockRefs.current[groupIndex] = node;
+              }}
+              className="relative z-20"
+            >
+              <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                <h3 className="text-[1.65rem] font-semibold leading-none text-white sm:text-[2rem]">
+                  {group.title}
+                </h3>
+                <p className="font-mono text-xs text-[#8D78FF] sm:text-sm">
+                  {group.command}
+                </p>
+              </div>
+
+              <div className="overflow-hidden rounded-2xl border border-[#8D78FF]/18 bg-[#090912]/70 shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_24px_80px_rgba(7,5,20,0.28)] backdrop-blur-xl">
                 <div
-                  key={item.label}
-                  className="min-w-24 rounded-[1.35rem] bg-[#141323]/80 px-4 py-3"
+                  ref={(node) => {
+                    panelHeaderRefs.current[groupIndex] = node;
+                  }}
+                  className="flex items-center justify-between gap-4 border-b border-white/[0.07] bg-[#141323]/70 px-4 py-3 sm:px-5"
                 >
-                  <p className="text-2xl font-semibold leading-none text-white">
-                    {item.value}
+                  <p className="font-mono text-xs text-[#C8BEFF] sm:text-sm">
+                    {group.path}
                   </p>
-                  <p className="mt-2 text-xs font-medium text-[#928BA7]">
-                    {item.label}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-10 flex flex-col gap-9 lg:mt-0">
-            {stackGroups.map((group, groupIndex) => (
-              <div
-                key={group.title}
-                ref={(node) => {
-                  clusterRefs.current[groupIndex] = node;
-                }}
-                className={`relative z-20 lg:absolute ${group.placement}`}
-              >
-                <div className="mb-4 flex items-baseline gap-3">
-                  <h3 className="text-[1.45rem] font-semibold leading-none text-white">
-                    {group.title}
-                  </h3>
-                  <p className="text-sm font-medium text-[#8D78FF]">
-                    {group.note}
-                  </p>
+                  <span className="font-mono text-[11px] text-[#6F6883]">
+                    {group.items.length} entries
+                  </span>
                 </div>
 
-                <div className="flex flex-wrap gap-3">
-                  {group.items.map(
-                    ({ name, Icon, color, featured }, itemIndex) => (
-                      <div
-                        key={`${group.title}-${name}`}
-                        ref={(node) => {
-                          chipRefs.current[groupIndex * 24 + itemIndex] = node;
-                        }}
-                        className={`group inline-flex items-center gap-2.5 rounded-full px-3.5 py-2.5 shadow-[0_18px_46px_rgba(7,5,20,0.24)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:bg-[#7257FF]/20 ${
-                          featured ? "bg-[#19142B]/88" : "bg-white/[0.05]"
-                        }`}
-                      >
-                        <span
-                          className={`flex items-center justify-center rounded-full ${
-                            featured
-                              ? "h-10 w-10 bg-[#8D78FF]/12"
-                              : "h-9 w-9 bg-white/[0.055]"
-                          }`}
-                        >
-                          <Icon
-                            className={
-                              featured ? "h-[18px] w-[18px]" : "h-4 w-4"
-                            }
-                            style={{ color }}
-                            aria-hidden
-                          />
-                        </span>
-                        <span className="text-sm font-medium text-white md:text-[15px]">
+                <div className="flex flex-wrap content-start gap-x-4 gap-y-2 px-4 py-5 font-mono sm:gap-x-6 sm:px-5 sm:py-6">
+                  {group.items.map(({ name, Icon, color, tone }, itemIndex) => (
+                    <button
+                      type="button"
+                      key={`${group.title}-${name}`}
+                      ref={(node) => {
+                        lineRefs.current[groupIndex * 16 + itemIndex] = node;
+                      }}
+                      className="group inline-flex min-h-9 items-center gap-2 rounded-md px-2 py-1.5 text-left transition duration-200 hover:bg-[#8D78FF]/10 hover:shadow-[0_0_24px_rgba(141,120,255,0.12)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8D78FF]"
+                    >
+                      <span className="text-xs text-[#6F6883] transition group-hover:text-[#A698FF]">
+                        &gt;
+                      </span>
+                      <span className="inline-flex items-center gap-2">
+                        <Icon
+                          className="h-4 w-4 shrink-0"
+                          style={{ color }}
+                          aria-hidden
+                        />
+                        <span className={`text-sm leading-none ${tone}`}>
                           {name}
                         </span>
-                      </div>
-                    )
-                  )}
+                      </span>
+                    </button>
+                  ))}
+                  <span
+                    ref={(node) => {
+                      cursorRefs.current[groupIndex] = node;
+                    }}
+                    className="terminal-cursor-blink ml-1 mt-2 inline-block h-5 w-px bg-[#8D78FF] motion-reduce:hidden"
+                    aria-hidden="true"
+                  />
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
