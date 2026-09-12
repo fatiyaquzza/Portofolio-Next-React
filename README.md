@@ -18,7 +18,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-The site runs at `http://localhost:3000`. Development uses `.next`; production builds use `.next-build` so a dev cache cannot corrupt production verification.
+The site runs at `http://localhost:3000`. Next.js writes development and production output to its standard `.next` directory, as required by Vercel's Next.js adapter.
 
 ## Environment variables
 
