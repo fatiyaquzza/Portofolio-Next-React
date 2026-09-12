@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { auth } from "../../lib/firebase";
+import { getClientAuth } from "../../lib/firebaseAuth";
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { useAuth } from "../../context/AuthContext";
 import { FcGoogle } from "react-icons/fc";
@@ -42,6 +42,7 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     try {
+      const auth = getClientAuth();
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: "select_account" });
       const result = await signInWithPopup(auth, provider);

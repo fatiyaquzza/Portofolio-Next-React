@@ -1,6 +1,6 @@
 "use client";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { auth } from "../lib/firebase";
+import { getClientAuth } from "../lib/firebaseAuth";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 
 type AuthContextValue = {
@@ -14,11 +14,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null | undefined>(undefined);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, setUser);
+    const unsubscribe = onAuthStateChanged(getClientAuth(), setUser);
     return () => unsubscribe();
   }, []);
 
-  const handleSignOut = useCallback(() => signOut(auth), []);
+  const handleSignOut = useCallback(() => signOut(getClientAuth()), []);
   const value = useMemo(() => ({ user, signOut: handleSignOut }), [user, handleSignOut]);
 
   return (

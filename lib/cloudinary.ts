@@ -1,4 +1,4 @@
-import { auth } from "./firebase";
+import { getClientAuth } from "./firebaseAuth";
 
 const allowedTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
 
@@ -6,7 +6,7 @@ export async function uploadToCloudinary(file: File): Promise<string> {
   if (file.size > 5 * 1024 * 1024) throw new Error("File terlalu besar (maksimal 5 MB)");
   if (!allowedTypes.has(file.type)) throw new Error("Gunakan gambar JPG, PNG, atau WebP");
 
-  const token = await auth.currentUser?.getIdToken();
+  const token = await getClientAuth().currentUser?.getIdToken();
   if (!token) throw new Error("Sesi admin telah berakhir. Silakan login kembali.");
 
   const signatureResponse = await fetch("/api/admin/cloudinary-signature", {

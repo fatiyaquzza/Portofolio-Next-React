@@ -1,13 +1,6 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
 import "./globals.css";
 import ThemeProvider from "./components/ThemeProvider";
-
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800", "900"],
-  variable: "--font-poppins",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.fatiya.dev"),
@@ -38,7 +31,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className="dark scroll-smooth" data-scroll-behavior="smooth" suppressHydrationWarning>
-      <body className={`${poppins.variable} font-sans antialiased`}>
+      <body className="font-sans antialiased">
         <noscript><style>{'[data-aos] { opacity: 1 !important; transform: none !important; } .theme-toggle { display: none !important; }'}</style></noscript>
         <ThemeProvider>{children}</ThemeProvider>
       </body>
