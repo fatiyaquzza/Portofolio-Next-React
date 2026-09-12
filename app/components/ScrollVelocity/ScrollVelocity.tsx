@@ -7,6 +7,7 @@ import {
   useMotionValue,
   useVelocity,
   useAnimationFrame,
+  useReducedMotion,
 } from "framer-motion";
 
 interface VelocityMapping {
@@ -31,7 +32,6 @@ interface VelocityTextProps {
   scrollerClassName?: string;
   parallaxStyle?: React.CSSProperties;
   scrollerStyle?: React.CSSProperties;
-  href?: string;
 }
 
 interface ScrollVelocityProps {
@@ -95,7 +95,6 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
     scrollerClassName,
     parallaxStyle,
     scrollerStyle,
-    href,
   }: VelocityTextProps) {
     const baseX = useMotionValue(0);
     const scrollOptions = scrollContainerRef
@@ -114,7 +113,7 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
       { clamp: false }
     );
 
-    const copyRef = useRef<HTMLAnchorElement>(null);
+    const copyRef = useRef<HTMLSpanElement>(null);
     const copyWidth = useElementWidth(copyRef);
 
     function wrap(min: number, max: number, v: number): number {
@@ -129,7 +128,9 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
     });
 
     const directionFactor = useRef<number>(1);
+    const reducedMotion = useReducedMotion();
     useAnimationFrame((t, delta) => {
+      if (reducedMotion) return;
       let moveBy = directionFactor.current * baseVelocity * (delta / 1000);
 
       if (velocityFactor.get() < 0) {
@@ -145,16 +146,13 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
     const spans = [];
     for (let i = 0; i < numCopies!; i++) {
       spans.push(
-        <a
-          href={href}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`flex-shrink-0 hover:text-[#2B0780]  transition-colors ${className}`}
+        <span
+          className={`flex-shrink-0 ${className}`}
           key={i}
           ref={i === 0 ? copyRef : null}
         >
           {children}
-        </a>
+        </span>
       );
     }
 

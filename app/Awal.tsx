@@ -22,11 +22,12 @@ export default function Awal() {
 
   return (
     <section
-      className="relative min-h-[100svh] overflow-hidden bg-[#131320] md:h-screen"
+      className="relative min-h-[100svh] overflow-hidden bg-surface-section md:h-screen"
       id="home"
     >
       <div className="absolute inset-0">
         <DarkVeil />
+        <div className="hero-theme-wash pointer-events-none absolute inset-0" />
       </div>
       <div className="relative z-10 grid min-h-[100svh] grid-cols-1 grid-rows-[auto_46svh] items-center gap-y-4 bg-transparent px-5 pb-4 pt-28 sm:grid-rows-[auto_50svh] sm:gap-y-6 sm:px-8 md:h-full md:min-h-0 md:grid-cols-12 md:grid-rows-1 md:gap-y-0 md:px-0 md:py-0">
         <div className="relative order-2 h-full min-h-0 md:order-1 md:col-span-5 md:pr-10">
@@ -37,19 +38,19 @@ export default function Awal() {
             <div className="mb-3 flex items-center gap-2.5 sm:mb-4 md:mb-5">
               <span className="relative flex h-2 w-2" aria-hidden="true">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#8D78FF] opacity-50 motion-reduce:animate-none" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-[#9B89FF] shadow-[0_0_12px_rgba(155,137,255,0.9)]" />
+                <span className="theme-shadow relative inline-flex h-2 w-2 rounded-full bg-[#9B89FF] shadow-[0_0_12px_rgba(155,137,255,0.9)]" />
               </span>
-              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#A999FF] sm:text-xs">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-theme-accent sm:text-xs">
                 Available for freelance
               </p>
             </div>
-            <h1 className="max-w-[680px] text-balance text-[clamp(2rem,8vw,2.75rem)] font-bold leading-tight text-white sm:text-5xl md:text-5xl">
+            <h1 className="max-w-[680px] text-balance text-[clamp(2rem,8vw,2.75rem)] font-bold leading-tight text-foreground sm:text-5xl md:text-5xl">
               Hi, I am{" "}
               <span className="bg-gradient-to-r from-[#7257FF] via-[#8D78FF] to-[#D8D1FF] bg-clip-text text-transparent">
                 Fatiya Quzza
               </span>
             </h1>
-            <div className="mt-2 min-h-9 max-w-[620px] text-pretty text-lg font-semibold leading-tight text-[#8F8AA8] sm:mt-3 sm:min-h-10 sm:text-xl md:min-h-12 md:text-2xl">
+            <div className="mt-2 min-h-9 max-w-[620px] text-pretty text-lg font-semibold leading-tight text-ink-type sm:mt-3 sm:min-h-10 sm:text-xl md:min-h-12 md:text-2xl">
               <TextType
                 text={[
                   "Web Developer",
@@ -60,10 +61,10 @@ export default function Awal() {
                 pauseDuration={700}
                 showCursor={true}
                 cursorCharacter="|"
-                textColors={["#8F8AA8"]}
+                textColors={["var(--ink-type)"]}
               />
             </div>
-            <p className="mt-4 max-w-[560px] text-pretty text-xs leading-5 text-[#B2ADBE] sm:text-sm sm:leading-7 md:mt-5">
+            <p className="mt-4 max-w-[560px] text-pretty text-xs leading-5 text-ink-body sm:text-sm sm:leading-7 md:mt-5">
               Architecting seamless digital experiences with a focus on clean
               code, user-friendly interfaces, and reliable functionality.
               Transforming ideas into elegant mobile and web solutions.
@@ -72,7 +73,7 @@ export default function Awal() {
             <div className="mt-6 flex flex-wrap items-center gap-4 sm:mt-7 md:mt-8">
               <a
                 href="/Fatiya-Quzza-CV.pdf"
-                className="group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full border border-white/10 bg-[#7257FF]/20 px-5 py-2.5 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_12px_36px_rgba(43,7,128,0.22)] backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:border-[#9B89FF]/45 hover:bg-[#7257FF]/30 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_16px_42px_rgba(114,87,255,0.25)] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#8D78FF]/30 active:translate-y-0 sm:px-6 sm:py-3"
+                className="theme-shadow group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full border border-contrast/10 bg-[#7257FF]/20 px-5 py-2.5 text-sm font-semibold text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_12px_36px_rgba(43,7,128,0.22)] backdrop-blur-xl transition duration-300 hover:-translate-y-0.5 hover:border-[#9B89FF]/45 hover:bg-[#7257FF]/30 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_16px_42px_rgba(114,87,255,0.25)] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#8D78FF]/30 active:translate-y-0 sm:px-6 sm:py-3"
               >
                 <span
                   className="pointer-events-none absolute -right-7 -top-8 h-20 w-20 rounded-full bg-[#D8D1FF]/15 blur-2xl transition-colors duration-300 group-hover:bg-[#D8D1FF]/25"
@@ -88,7 +89,7 @@ export default function Awal() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-[#D8D5E1] backdrop-blur-lg transition duration-300 hover:-translate-y-0.5 hover:border-[#8D78FF]/40 hover:bg-[#7257FF]/15 hover:text-[#B7AAFF] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#8D78FF]/25 active:translate-y-0"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-contrast/10 bg-contrast/[0.04] text-ink-icon backdrop-blur-lg transition duration-300 hover:-translate-y-0.5 hover:border-[#8D78FF]/40 hover:bg-[#7257FF]/15 hover:text-theme-accent focus:outline-none focus-visible:ring-4 focus-visible:ring-[#8D78FF]/25 active:translate-y-0"
               >
                 <svg
                   role="img"
@@ -106,7 +107,7 @@ export default function Awal() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-[#D8D5E1] backdrop-blur-lg transition duration-300 hover:-translate-y-0.5 hover:border-[#8D78FF]/40 hover:bg-[#7257FF]/15 hover:text-[#B7AAFF] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#8D78FF]/25 active:translate-y-0"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-contrast/10 bg-contrast/[0.04] text-ink-icon backdrop-blur-lg transition duration-300 hover:-translate-y-0.5 hover:border-[#8D78FF]/40 hover:bg-[#7257FF]/15 hover:text-theme-accent focus:outline-none focus-visible:ring-4 focus-visible:ring-[#8D78FF]/25 active:translate-y-0"
               >
                 <svg
                   role="img"
@@ -125,7 +126,7 @@ export default function Awal() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="GitHub"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-[#D8D5E1] backdrop-blur-lg transition duration-300 hover:-translate-y-0.5 hover:border-[#8D78FF]/40 hover:bg-[#7257FF]/15 hover:text-[#B7AAFF] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#8D78FF]/25 active:translate-y-0"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-contrast/10 bg-contrast/[0.04] text-ink-icon backdrop-blur-lg transition duration-300 hover:-translate-y-0.5 hover:border-[#8D78FF]/40 hover:bg-[#7257FF]/15 hover:text-theme-accent focus:outline-none focus-visible:ring-4 focus-visible:ring-[#8D78FF]/25 active:translate-y-0"
               >
                 <svg
                   role="img"
@@ -147,7 +148,7 @@ export default function Awal() {
       <a
         href="#about"
         aria-label="Scroll to about section"
-        className={`group absolute bottom-5 left-1/2 z-20 hidden -translate-x-1/2 flex-col items-center gap-1 text-[#A9A4BC] transition-all duration-500 ease-out hover:text-white focus:outline-none focus-visible:text-white md:flex motion-reduce:duration-0 ${
+        className={`group absolute bottom-5 left-1/2 z-20 hidden -translate-x-1/2 flex-col items-center gap-1 text-ink-hint transition-all duration-500 ease-out hover:text-foreground focus:outline-none focus-visible:text-foreground md:flex motion-reduce:duration-0 ${
           showScrollHint
             ? "translate-y-0 opacity-100"
             : "pointer-events-none translate-y-2 opacity-0"

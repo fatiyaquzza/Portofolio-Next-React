@@ -6,14 +6,70 @@ service cloud.firestore {
       return request.auth != null && request.auth.token.admin == true;
     }
 
+    function validText(value, max) {
+      return value is string && value.size() > 0 && value.size() <= max;
+    }
+
+    function validOptionalText(data, field, max) {
+      return !(field in data) || (data[field] is string && data[field].size() <= max);
+    }
+
+    function validUrl(value) {
+      return value is string
+        && value.size() <= 2048
+        && (value.size() == 0 || value.matches('https?://.+') || value.matches('/[^/].*'));
+    }
+
+    function validRequiredUrl(value) {
+      return validUrl(value) && value.size() > 0;
+    }
+
+    function validOptionalUrl(data, field) {
+      return !(field in data) || validUrl(data[field]);
+    }
+
+    function validExperience(data) {
+      return data.keys().hasOnly(['title', 'company', 'year', 'description', 'order', 'createdAt'])
+        && data.keys().hasAll(['title', 'company', 'year', 'description'])
+        && validText(data.title, 160)
+        && validText(data.company, 160)
+        && validText(data.year, 80)
+        && validText(data.description, 3000)
+        && (!('order' in data) || (data.order is number && data.order >= 0 && data.order <= 9999))
+        && (!('createdAt' in data) || data.createdAt is timestamp);
+    }
+
+    function validProject(data) {
+      return data.keys().hasOnly([
+          'title', 'image', 'link', 'tools', 'type', 'description', 'role',
+          'demoUrl', 'repoUrl', 'featured', 'createdAt'
+        ])
+        && data.keys().hasAll([
+          'title', 'image', 'link', 'tools', 'type', 'description', 'featured'
+        ])
+        && validText(data.title, 160)
+        && validRequiredUrl(data.image)
+        && validUrl(data.link)
+        && validText(data.tools, 1000)
+        && data.type in ['Website', 'Mobile App']
+        && validText(data.description, 5000)
+        && validOptionalText(data, 'role', 300)
+        && validOptionalUrl(data, 'demoUrl')
+        && validOptionalUrl(data, 'repoUrl')
+        && data.featured is bool
+        && (!('createdAt' in data) || data.createdAt is timestamp);
+    }
+
     match /experiences/{experienceId} {
       allow read: if true;
-      allow create, update, delete: if isAdmin();
+      allow create, update: if isAdmin() && validExperience(request.resource.data);
+      allow delete: if isAdmin();
     }
 
     match /projects/{projectId} {
       allow read: if true;
-      allow create, update, delete: if isAdmin();
+      allow create, update: if isAdmin() && validProject(request.resource.data);
+      allow delete: if isAdmin();
     }
 
     match /{document=**} {

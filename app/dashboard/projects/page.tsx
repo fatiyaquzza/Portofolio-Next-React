@@ -1,5 +1,13 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import ThemeToggle from "@/app/components/ThemeToggle";
+
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { FiArrowLeft, FiUploadCloud } from "react-icons/fi";
+import ConfirmDialog from "@/app/components/ConfirmDialog";
+import SafeImage from "@/app/components/SafeImage";
+import { projectLinks, type ProjectType } from "@/lib/content";
+import { uploadToCloudinary } from "@/lib/cloudinary";
 import {
   addProject,
   deleteProject,
@@ -7,43 +15,60 @@ import {
   ProjectDoc,
   updateProject,
 } from "@/lib/firestoreCrud";
-import { uploadToCloudinary } from "@/lib/cloudinary";
-import { useRouter } from "next/navigation";
-import { FiArrowLeft, FiUploadCloud } from "react-icons/fi";
+
+type FormState = {
+  title: string;
+  type: ProjectType;
+  tools: string;
+  description: string;
+  role: string;
+  demoUrl: string;
+  repoUrl: string;
+  image: string;
+  featured: boolean;
+};
+
+const emptyForm: FormState = {
+  title: "",
+  type: "Website",
+  tools: "",
+  description: "",
+  role: "",
+  demoUrl: "",
+  repoUrl: "",
+  image: "",
+  featured: false,
+};
+
+const fieldClass =
+  "w-full rounded-xl bg-surface-panel px-4 py-3 text-foreground ring-1 ring-inset ring-contrast/10 outline-none transition placeholder:text-ink-secondary focus:ring-2 focus:ring-[#8D78FF] disabled:opacity-60";
 
 export default function ProjectsCRUD() {
   const [projects, setProjects] = useState<ProjectDoc[]>([]);
-  const [form, setForm] = useState({
-    title: "",
-    link: "",
-    tools: "",
-    type: "",
-    image: "",
-  });
+  const [form, setForm] = useState<FormState>(emptyForm);
   const [editing, setEditing] = useState<string | null>(null);
-  const [showDelete, setShowDelete] = useState<{
-    id: string;
-    title: string;
-  } | null>(null);
-  const [toast, setToast] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<ProjectDoc | null>(null);
+  const [busy, setBusy] = useState<"upload" | "save" | "delete" | null>(null);
   const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState<{ tone: "success" | "error"; text: string } | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const operationRef = useRef(false);
   const router = useRouter();
 
-  useEffect(() => {
-    getProjects()
-      .then(setProjects)
-      .finally(() => setLoading(false));
+  const loadProjects = useCallback(async () => {
+    setLoading(true);
+    try {
+      setProjects(await getProjects());
+    } catch {
+      setMessage({ tone: "error", text: "Projects could not be loaded. Try again." });
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  useEffect(() => {
-    if (!toast) return;
-    const t = setTimeout(() => setToast(null), 1800);
-    return () => clearTimeout(t);
-  }, [toast]);
-
+  useEffect(() => void loadProjects(), [loadProjects]);
   useEffect(() => {
     if (!file) {
       setPreview(null);
@@ -54,452 +79,193 @@ export default function ProjectsCRUD() {
     return () => URL.revokeObjectURL(url);
   }, [file]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.title || !form.tools || !form.type || !form.link)
-      return setToast("Please fill all fields!");
-
-    let imageUrl = form.image || "";
-    if (file) imageUrl = await uploadToCloudinary(file);
-    const payload = { ...form, image: imageUrl };
-
-    if (editing) {
-      await updateProject(editing, payload);
-      setToast("Project updated!");
-    } else {
-      await addProject(payload);
-      setToast("Project added!");
-    }
+  const resetForm = () => {
     setEditing(null);
-    setForm({ title: "", link: "", tools: "", type: "", image: "" });
+    setForm(emptyForm);
     setFile(null);
     setPreview(null);
     if (fileRef.current) fileRef.current.value = "";
-    setProjects(await getProjects());
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (operationRef.current) return;
+    operationRef.current = true;
+    setMessage(null);
+    setBusy(file ? "upload" : "save");
+
+    try {
+      let image = form.image;
+      if (file) {
+        image = await uploadToCloudinary(file);
+        setBusy("save");
+      }
+      if (!image) throw new Error("Project image is required.");
+      const payload = {
+        ...form,
+        title: form.title.trim(),
+        type: form.type,
+        tools: form.tools.trim(),
+        description: form.description.trim(),
+        role: form.role.trim(),
+        demoUrl: form.demoUrl.trim(),
+        repoUrl: form.repoUrl.trim(),
+        image,
+        link: form.demoUrl.trim() || form.repoUrl.trim(),
+      };
+
+      if (editing) await updateProject(editing, payload);
+      else await addProject(payload);
+
+      resetForm();
+      setMessage({ tone: "success", text: editing ? "Project updated." : "Project added." });
+      try {
+        setProjects(await getProjects());
+      } catch {
+        setMessage({ tone: "error", text: "Saved, but the list could not be refreshed." });
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (error) {
+      setMessage({
+        tone: "error",
+        text: error instanceof Error ? error.message : "Project could not be saved.",
+      });
+    } finally {
+      operationRef.current = false;
+      setBusy(null);
+    }
+  };
+
+  const handleEdit = (project: ProjectDoc) => {
+    const links = projectLinks(project);
+    setForm({
+      title: project.title,
+      type: project.type,
+      tools: project.tools,
+      description: project.description || "",
+      role: project.role || "",
+      demoUrl: links.demoUrl || "",
+      repoUrl: links.repoUrl || "",
+      image: project.image,
+      featured: project.featured,
+    });
+    setEditing(project.id || null);
+    setFile(null);
+    setPreview(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const handleEdit = (p: ProjectDoc) => {
-    setForm({
-      title: p.title,
-      link: p.link,
-      tools: p.tools,
-      type: p.type,
-      image: p.image || "",
-    });
-    setEditing(p.id!);
-    setPreview(p.image || null);
-    setFile(null);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  const confirmDelete = async () => {
+    if (!deleting?.id || operationRef.current) return;
+    operationRef.current = true;
+    setBusy("delete");
+    setMessage(null);
+    try {
+      await deleteProject(deleting.id);
+      setProjects((items) => items.filter((item) => item.id !== deleting.id));
+      setDeleting(null);
+      setMessage({ tone: "success", text: "Project deleted." });
+    } catch {
+      setMessage({ tone: "error", text: "Project could not be deleted." });
+    } finally {
+      operationRef.current = false;
+      setBusy(null);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-[#070a11] text-white relative overflow-hidden">
-      {/* Ambient background */}
-      <div aria-hidden className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(60%_60%_at_20%_10%,rgba(99,17,225,0.25)_0%,rgba(99,17,225,0)_70%),radial-gradient(60%_60%_at_80%_90%,rgba(97,132,220,0.2)_0%,rgba(97,132,220,0)_70%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:48px_48px] opacity-[0.12]" />
-      </div>
-
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 md:px-10 py-10">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+    <main className="relative min-h-screen overflow-hidden bg-surface-deep px-4 py-10 text-foreground sm:px-6 md:px-10">
+      <div className="relative z-10 mx-auto max-w-6xl">
+        <header className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div>
-            <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight">
-              <span className="bg-gradient-to-r from-[#9fb5ff] via-[#7e89ff] to-[#b58cff] bg-clip-text text-transparent">
-                Manage Projects
-              </span>
-            </h1>
-            <p className="mt-1 text-sm text-gray-300/80">
-              Create, update, and organize your work portfolio with ease.
-            </p>
+            <h1 className="text-3xl font-extrabold tracking-tight md:text-4xl">Manage Projects</h1>
+            <p className="mt-2 text-sm text-ink-secondary">Publish complete, accurate portfolio case summaries.</p>
           </div>
-          <button
-            onClick={() => router.push("/dashboard")}
-            className="group relative inline-flex items-center gap-2 rounded-xl bg-[#101628] px-4 py-2 font-semibold text-gray-200 ring-1 ring-white/10 transition hover:bg-[#141c2f] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#6311E1]/30"
-          >
-            <FiArrowLeft className="text-lg transition group-hover:-translate-x-0.5" />
-            <span>Back</span>
+          <button type="button" onClick={() => router.push("/dashboard")} className="inline-flex min-h-11 items-center gap-2 self-start rounded-xl bg-surface-input px-4 font-semibold ring-1 ring-contrast/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#8D78FF]">
+            <FiArrowLeft aria-hidden="true" /> Back
           </button>
-        </div>
+          <ThemeToggle />
+        </header>
 
-        {toast && (
-          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl shadow-2xl bg-[#0f1424]/95 text-[#e7deff] font-semibold ring-1 ring-[#6311E1]/40 animate-fade-in text-sm backdrop-blur">
-            {toast}
+        {message && (
+          <div role={message.tone === "error" ? "alert" : "status"} className={`mb-6 rounded-xl border px-4 py-3 text-sm ${message.tone === "error" ? "border-red-400/30 bg-red-400/10 text-red-800 dark:text-red-100" : "border-emerald-400/30 bg-emerald-400/10 text-emerald-800 dark:text-emerald-100"}`}>
+            {message.text}
           </div>
         )}
 
-        {/* Form */}
-        <section className="rounded-2xl border border-white/10 bg-[#0c1222]/70 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.3)] overflow-hidden mb-10">
-          <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
-            <div className="space-y-0.5">
-              <h2 className="text-lg font-bold">
-                {editing ? "Update Project" : "Add Project"}
-              </h2>
-              <p className="text-xs text-gray-400">
-                Please fill in all required fields below.
-              </p>
+        <section className="mb-10 overflow-hidden rounded-2xl border border-contrast/10 bg-surface-admin-card/80">
+          <div className="flex items-center justify-between border-b border-contrast/10 px-6 py-4">
+            <div>
+              <h2 className="text-lg font-bold">{editing ? "Update Project" : "Add Project"}</h2>
+              <p className="mt-1 text-xs text-ink-secondary">Required fields are marked with an asterisk.</p>
             </div>
-            {editing && (
-              <button
-                type="button"
-                className="text-xs text-gray-300/90 hover:text-white underline underline-offset-4"
-                onClick={() => {
-                  setEditing(null);
-                  setForm({
-                    title: "",
-                    link: "",
-                    tools: "",
-                    type: "",
-                    image: "",
-                  });
-                  setFile(null);
-                  setPreview(null);
-                  if (fileRef.current) fileRef.current.value = "";
-                }}
-              >
-                Cancel edit
-              </button>
-            )}
+            {editing && <button type="button" onClick={resetForm} disabled={busy !== null} className="text-sm text-theme-accent underline underline-offset-4">Cancel edit</button>}
           </div>
 
-          <form
-            onSubmit={handleSubmit}
-            className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6"
-          >
-            <div className="lg:col-span-2 grid grid-cols-1 gap-6">
-              <label className="block">
-                <span className="mb-2 block text-sm text-gray-300">Title</span>
-                <input
-                  placeholder="e.g., Personal Portfolio"
-                  value={form.title}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, title: e.target.value }))
-                  }
-                  className="w-full px-4 py-3 rounded-xl bg-[#131a2e] text-white ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-[#6311E1] outline-none transition placeholder:text-gray-500"
-                  required
-                />
-              </label>
-              <label className="block">
-                <span className="mb-2 block text-sm text-gray-300">
-                  Link (repo/website)
-                </span>
-                <input
-                  placeholder="https://…"
-                  value={form.link}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, link: e.target.value }))
-                  }
-                  className="w-full px-4 py-3 rounded-xl bg-[#131a2e] text-white ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-[#6311E1] outline-none transition placeholder:text-gray-500"
-                  required
-                />
-              </label>
-              <label className="block">
-                <span className="mb-2 block text-sm text-gray-300">
-                  Tools (comma separated)
-                </span>
-                <input
-                  placeholder="Next.js, Tailwind, Firebase"
-                  value={form.tools}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, tools: e.target.value }))
-                  }
-                  className="w-full px-4 py-3 rounded-xl bg-[#131a2e] text-white ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-[#6311E1] outline-none transition placeholder:text-gray-500"
-                  required
-                />
-              </label>
-              <label className="block">
-                <span className="mb-2 block text-sm text-gray-300">Type</span>
-                <input
-                  placeholder="e.g., Website, Mobile App"
-                  value={form.type}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, type: e.target.value }))
-                  }
-                  className="w-full px-4 py-3 rounded-xl bg-[#131a2e] text-white ring-1 ring-inset ring-white/10 focus:ring-2 focus:ring-[#6311E1] outline-none transition placeholder:text-gray-500"
-                  required
-                />
+          <form onSubmit={handleSubmit} className="grid gap-6 p-6 lg:grid-cols-3">
+            <div className="grid gap-5 lg:col-span-2 md:grid-cols-2">
+              <Field label="Title *"><input required maxLength={160} value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} className={fieldClass} /></Field>
+              <Field label="Type *">
+                <select required value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as ProjectType })} className={fieldClass}>
+                  <option value="Website">Website</option><option value="Mobile App">Mobile App</option>
+                </select>
+              </Field>
+              <Field label="Your role"><input maxLength={300} placeholder="Full-stack developer" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className={fieldClass} /></Field>
+              <div className="md:col-span-2"><Field label="Technology *"><input required maxLength={1000} placeholder="Next.js, Tailwind CSS, Firebase" value={form.tools} onChange={(e) => setForm({ ...form, tools: e.target.value })} className={fieldClass} /></Field></div>
+              <Field label="Live demo URL"><input type="url" maxLength={2048} placeholder="https://…" value={form.demoUrl} onChange={(e) => setForm({ ...form, demoUrl: e.target.value })} className={fieldClass} /></Field>
+              <Field label="Repository URL"><input type="url" maxLength={2048} placeholder="https://github.com/…" value={form.repoUrl} onChange={(e) => setForm({ ...form, repoUrl: e.target.value })} className={fieldClass} /></Field>
+              <div className="md:col-span-2"><Field label="Description *"><textarea required maxLength={5000} rows={6} placeholder="What the project does, the problem it solves, and your contribution." value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className={`${fieldClass} resize-y`} /></Field></div>
+              <label className="md:col-span-2 flex cursor-pointer items-start gap-3 rounded-xl border border-contrast/10 bg-surface-input p-4">
+                <input type="checkbox" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} className="mt-1 h-4 w-4 accent-[#7257FF]" />
+                <span><span className="block text-sm font-semibold text-ink-strong">Featured project</span><span className="mt-1 block text-xs leading-5 text-ink-secondary">Featuring this project automatically removes the featured status from the previous selection.</span></span>
               </label>
             </div>
 
-            <div className="lg:col-span-1 flex flex-col gap-4">
-              <label
-                htmlFor="image"
-                className="w-full min-h-[180px] flex flex-col items-center justify-center gap-3 px-4 py-6 bg-[#101628] border-2 border-dashed border-white/10 rounded-2xl cursor-pointer hover:bg-[#141c2f] transition text-center"
-              >
-                {preview || form.image ? (
-                  <img
-                    src={preview || form.image}
-                    alt="Preview"
-                    className="w-40 h-32 object-cover rounded-xl shadow-lg border border-white/10 bg-white"
-                  />
-                ) : (
-                  <div>
-                    <FiUploadCloud className="mx-auto text-3xl text-gray-400 mb-2" />
-                    <span className="font-semibold text-gray-200">
-                      Drop or click to upload
-                    </span>
-                    <p className="text-[11px] text-gray-400">
-                      PNG, JPG, up to a few MB
-                    </p>
-                  </div>
-                )}
-                <input
-                  id="image"
-                  ref={fileRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                />
-                {(file || preview) && (
-                  <button
-                    type="button"
-                    className="text-xs text-red-300 hover:text-red-200 underline mt-2"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setFile(null);
-                      setPreview(null);
-                      setForm((f) => ({ ...f, image: "" }));
-                      if (fileRef.current) fileRef.current.value = "";
-                    }}
-                  >
-                    Remove
-                  </button>
-                )}
+            <div className="flex flex-col gap-4">
+              <label htmlFor="project-image" className="flex min-h-56 cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-contrast/15 bg-surface-input p-5 text-center transition hover:bg-surface-input-hover focus-within:ring-2 focus-within:ring-[#8D78FF]">
+                {preview || form.image ? <SafeImage src={preview || form.image} alt="Project image preview" className="aspect-video w-full rounded-xl object-cover" /> : <><FiUploadCloud className="text-3xl text-theme-accent" aria-hidden="true" /><span className="font-semibold">Choose project image</span><span className="text-xs text-ink-secondary">JPG, PNG, or WebP · max 5 MB</span></>}
+                <input id="project-image" ref={fileRef} type="file" required={!form.image} accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => setFile(e.target.files?.[0] || null)} />
               </label>
-
-              <button
-                type="submit"
-                className="relative inline-flex items-center justify-center overflow-hidden rounded-xl px-6 py-3 font-bold text-white transition focus:outline-none focus-visible:ring-4 focus-visible:ring-[#6311E1]/30 bg-[#6311E1] hover:bg-gradient-to-r from-[#4570de] via-[#4046ec] to-[#5d03e5]"
-              >
-                <span className="relative">
-                  {editing ? "Update Project" : "Add Project"}
-                </span>
+              {(preview || form.image) && <button type="button" disabled={busy !== null} onClick={() => { setFile(null); setPreview(null); setForm({ ...form, image: "" }); if (fileRef.current) fileRef.current.value = ""; }} className="min-h-11 rounded-xl border border-red-400/25 text-sm text-red-800 dark:text-red-200">Remove image</button>}
+              <button type="submit" disabled={busy !== null} className="min-h-12 rounded-xl bg-[#6311E1] px-6 font-bold transition hover:bg-[#7257FF] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#B7AAFF] disabled:cursor-wait disabled:opacity-60 text-white">
+                {busy === "upload" ? "Uploading…" : busy === "save" ? "Saving…" : editing ? "Update Project" : "Add Project"}
               </button>
-              {editing && (
-                <button
-                  type="button"
-                  className="text-xs text-gray-400 hover:underline"
-                  onClick={() => {
-                    setEditing(null);
-                    setForm({
-                      title: "",
-                      link: "",
-                      tools: "",
-                      type: "",
-                      image: "",
-                    });
-                    setFile(null);
-                    setPreview(null);
-                    if (fileRef.current) fileRef.current.value = "";
-                  }}
-                >
-                  Cancel Edit
-                </button>
-              )}
             </div>
           </form>
         </section>
 
-        {/* List */}
-        <section className="rounded-2xl border border-white/10 bg-[#0c1222]/70 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.3)] overflow-hidden">
-          <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
+        <section className="overflow-hidden rounded-2xl border border-contrast/10 bg-surface-admin-card/80">
+          <div className="flex items-center justify-between border-b border-contrast/10 px-6 py-4">
             <h2 className="text-lg font-bold">Project List</h2>
-            <p className="text-xs text-gray-400">
-              {loading ? "Loading…" : `${projects.length} item(s)`}
-            </p>
+            <button type="button" onClick={loadProjects} disabled={loading || busy !== null} className="text-sm text-theme-accent disabled:opacity-50">{loading ? "Loading…" : `${projects.length} projects · Refresh`}</button>
           </div>
-
-          <div className="overflow-auto">
-            <table className="w-full text-left min-w-[880px]">
-              <thead className="sticky top-0 bg-[#0c1222]/95 backdrop-blur">
-                <tr className="border-b border-white/10">
-                  {["Image", "Title", "Type", "Tools", "Link", "Actions"].map(
-                    (h) => (
-                      <th
-                        key={h}
-                        className="p-3 text-[12px] uppercase tracking-wider text-gray-300/90"
-                      >
-                        {h}
-                      </th>
-                    )
-                  )}
-                </tr>
-              </thead>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[850px] text-left text-sm">
+              <caption className="sr-only">Projects available in the portfolio</caption>
+              <thead><tr className="border-b border-contrast/10 text-xs uppercase tracking-wider text-ink-secondary"><th className="p-4">Project</th><th className="p-4">Featured</th><th className="p-4">Technology</th><th className="p-4">Links</th><th className="p-4">Actions</th></tr></thead>
               <tbody>
-                {loading ? (
-                  [...Array(3)].map((_, i) => (
-                    <tr key={i} className="border-b border-[#232537]/40">
-                      <td className="p-3">
-                        <div className="h-14 w-20 rounded shimmer" />
-                      </td>
-                      <td className="p-3">
-                        <div className="h-4 w-40 rounded shimmer" />
-                      </td>
-                      <td className="p-3">
-                        <div className="h-4 w-24 rounded shimmer" />
-                      </td>
-                      <td className="p-3">
-                        <div className="h-4 w-56 rounded shimmer" />
-                      </td>
-                      <td className="p-3">
-                        <div className="h-4 w-64 rounded shimmer" />
-                      </td>
-                      <td className="p-3">
-                        <div className="h-8 w-24 rounded shimmer" />
-                      </td>
-                    </tr>
-                  ))
-                ) : projects.length ? (
-                  projects.map((p) => (
-                    <tr
-                      key={p.id}
-                      className="border-b border-white/10 hover:bg-white/[0.04] transition"
-                    >
-                      <td className="p-3">
-                        <img
-                          src={p.image}
-                          alt={p.title}
-                          className="w-20 h-14 object-cover rounded border border-white/10 bg-white"
-                        />
-                      </td>
-                      <td className="p-3 text-sm text-gray-100">{p.title}</td>
-                      <td className="p-3 text-gray-300 text-sm">{p.type}</td>
-                      <td className="p-3 text-gray-300 text-sm">
-                        <div className="max-w-xs truncate" title={p.tools}>
-                          {p.tools}
-                        </div>
-                      </td>
-                      <td className="p-3">
-                        <a
-                          href={p.link}
-                          target="_blank"
-                          className="text-[#9d5cff] underline underline-offset-2 break-all hover:opacity-90 text-sm"
-                        >
-                          Link
-                        </a>
-                      </td>
-                      <td className="p-3">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <button
-                            className="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm  text-[#cdbaff] ring-1 ring-[#6d57ff]/30 hover:bg-[#6311E1]/30 bg-[#141a2b] transition"
-                            onClick={() => handleEdit(p)}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            className="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm text-[#ffb3c6] ring-1 ring-[#ff8aa8]/30 hover:bg-[#1f1420] transition"
-                            onClick={() =>
-                              setShowDelete({ id: p.id!, title: p.title })
-                            }
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan={6} className="py-16">
-                      <div className="flex flex-col items-center justify-center text-center gap-3">
-                        <div className="h-16 w-16 rounded-2xl grid place-items-center bg-white/5 ring-1 ring-white/10">
-                          🗂️
-                        </div>
-                        <p className="text-gray-300 font-semibold">
-                          No project data yet.
-                        </p>
-                        <p className="text-sm text-gray-400 max-w-sm">
-                          Add your first project using the form above. It will
-                          appear here once saved.
-                        </p>
-                      </div>
-                    </td>
-                  </tr>
-                )}
+                {!loading && projects.map((project) => {
+                  const links = projectLinks(project);
+                  return <tr key={project.id} className="border-b border-contrast/10 align-top last:border-0">
+                    <td className="p-4"><p className="font-semibold">{project.title}</p><p className="mt-1 text-xs text-ink-secondary">{project.type}</p></td>
+                    <td className="p-4 text-ink-soft">{project.featured ? "Yes" : "No"}</td>
+                    <td className="max-w-xs p-4 text-ink-soft">{project.tools}</td>
+                    <td className="p-4 text-theme-accent">{links.demoUrl ? "Demo " : ""}{links.repoUrl ? "Repository" : ""}{!links.demoUrl && !links.repoUrl ? "—" : ""}</td>
+                    <td className="p-4"><div className="flex gap-2"><button type="button" onClick={() => handleEdit(project)} disabled={busy !== null} className="min-h-10 rounded-lg bg-surface-raised px-4 text-theme-accent">Edit</button><button type="button" onClick={() => setDeleting(project)} disabled={busy !== null} className="min-h-10 rounded-lg border border-red-400/25 px-4 text-red-800 dark:text-red-200">Delete</button></div></td>
+                  </tr>;
+                })}
+                {!loading && projects.length === 0 && <tr><td colSpan={5} className="p-12 text-center text-ink-secondary">No project data yet.</td></tr>}
               </tbody>
             </table>
           </div>
         </section>
-
-        {/* Global styles */}
-        <style jsx global>{`
-          .shimmer {
-            background: linear-gradient(
-              90deg,
-              #141c2b 25%,
-              #1b2538 50%,
-              #141c2b 75%
-            );
-            background-size: 200% 100%;
-            animation: shimmer 1.6s infinite;
-          }
-          @keyframes shimmer {
-            0% {
-              background-position: 200% 0;
-            }
-            100% {
-              background-position: -200% 0;
-            }
-          }
-          @keyframes fade-in {
-            from {
-              opacity: 0;
-              transform: translateY(4px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-          .animate-fade-in {
-            animation: fade-in 0.25s ease-out;
-          }
-        `}</style>
-
-        {/* Delete Modal */}
-        {showDelete && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-50 animate-fade-in p-4">
-            <div className="w-full sm:max-w-sm rounded-2xl border border-white/10 bg-[#0c1222]/95 shadow-2xl p-6">
-              <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-[#1a1630] ring-1 ring-inset ring-[#6311E1]/40">
-                <span className="text-3xl">⚠️</span>
-              </div>
-              <h2 className="font-bold text-xl mb-2 text-center">
-                Delete Project?
-              </h2>
-              <p className="mb-6 text-gray-300 text-center">
-                Are you sure you want to delete{" "}
-                <span className="font-semibold text-white">
-                  {showDelete.title}
-                </span>
-                ?
-              </p>
-              <div className="flex flex-col sm:flex-row justify-center gap-3">
-                <button
-                  className="relative inline-flex items-center justify-center overflow-hidden rounded-xl px-6 py-2.5 font-bold text-white transition focus:outline-none focus-visible:ring-4 focus-visible:ring-[#6311E1]/30"
-                  onClick={async () => {
-                    await deleteProject(showDelete.id);
-                    setProjects(await getProjects());
-                    setShowDelete(null);
-                    setToast("Project deleted!");
-                  }}
-                >
-                  <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#6184DC] via-[#5a5ee7] to-[#6311E1]" />
-                  <span className="absolute inset-[2px] rounded-[10px] bg-[#0b1120]/80 backdrop-blur" />
-                  <span className="relative">Yes, Delete</span>
-                </button>
-                <button
-                  className="px-6 py-2.5 rounded-xl bg-[#101628] text-gray-200 ring-1 ring-inset ring-white/10 hover:bg-[#141c2f] transition"
-                  onClick={() => setShowDelete(null)}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
-    </div>
+
+      {deleting && <ConfirmDialog title="Delete project?" description={<>Delete <strong>{deleting.title}</strong> permanently?</>} busy={busy === "delete"} onCancel={() => setDeleting(null)} onConfirm={confirmDelete} />}
+    </main>
   );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return <label className="block"><span className="mb-2 block text-sm text-ink-soft">{label}</span>{children}</label>;
 }

@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import SafeImage from "@/app/components/SafeImage";
 import {
   IconArrowLeft,
   IconArrowRight,
@@ -20,6 +22,7 @@ import {
   SiCss3,
   SiDart,
   SiDocker,
+  SiExpo,
   SiExpress,
   SiFirebase,
   SiFigma,
@@ -45,10 +48,13 @@ import {
   SiPostgresql,
   SiPostman,
   SiPrisma,
+  SiPython,
   SiReact,
   SiRedux,
   SiSupabase,
+  SiStreamlit,
   SiTailwindcss,
+  SiTensorflow,
   SiThreedotjs,
   SiTypescript,
   SiVercel,
@@ -57,8 +63,17 @@ import {
 } from "react-icons/si";
 import type { IconType } from "react-icons";
 import { getProjects, ProjectDoc } from "../lib/firestoreCrud";
+import { projectLinks } from "../lib/content";
 
-const projectsPerPage = 10;
+type ProjectFilter = "all" | "web" | "mobile";
+
+const gridProjectsPerPage = 6;
+
+const projectFilters: { value: ProjectFilter; label: string }[] = [
+  { value: "all", label: "--all" },
+  { value: "web", label: "--web" },
+  { value: "mobile", label: "--mobile" },
+];
 
 type ToolMeta = {
   Icon: IconType;
@@ -77,6 +92,7 @@ const toolIcons: Record<string, ToolMeta> = {
   css3: { Icon: SiCss3, color: "#1572B6" },
   dart: { Icon: SiDart, color: "#0175C2" },
   docker: { Icon: SiDocker, color: "#2496ED" },
+  expo: { Icon: SiExpo, color: "#F8FAFC" },
   express: { Icon: SiExpress, color: "#F8FAFC" },
   "express.js": { Icon: SiExpress, color: "#F8FAFC" },
   expressjs: { Icon: SiExpress, color: "#F8FAFC" },
@@ -115,6 +131,7 @@ const toolIcons: Record<string, ToolMeta> = {
   postgres: { Icon: SiPostgresql, color: "#4169E1" },
   postman: { Icon: SiPostman, color: "#FF6C37" },
   prisma: { Icon: SiPrisma, color: "#F8FAFC" },
+  python: { Icon: SiPython, color: "#FFD43B" },
   react: { Icon: SiReact, color: "#61DAFB" },
   "react js": { Icon: SiReact, color: "#61DAFB" },
   "react.js": { Icon: SiReact, color: "#61DAFB" },
@@ -122,10 +139,12 @@ const toolIcons: Record<string, ToolMeta> = {
   "react native": { Icon: SiReact, color: "#61DAFB" },
   redux: { Icon: SiRedux, color: "#764ABC" },
   supabase: { Icon: SiSupabase, color: "#3ECF8E" },
+  streamlit: { Icon: SiStreamlit, color: "#FF4B4B" },
   tailwind: { Icon: SiTailwindcss, color: "#38BDF8" },
   "tailwind css": { Icon: SiTailwindcss, color: "#38BDF8" },
   "tailwind-css": { Icon: SiTailwindcss, color: "#38BDF8" },
   tailwindcss: { Icon: SiTailwindcss, color: "#38BDF8" },
+  tensorflow: { Icon: SiTensorflow, color: "#FF6F00" },
   three: { Icon: SiThreedotjs, color: "#F8FAFC" },
   "three.js": { Icon: SiThreedotjs, color: "#F8FAFC" },
   threejs: { Icon: SiThreedotjs, color: "#F8FAFC" },
@@ -158,40 +177,36 @@ const getToolMeta = (tool: string) => {
   return toolIcons[normalized] ?? toolIcons[compact];
 };
 
-const slugify = (value: string) =>
-  value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)+/g, "");
+const isFeaturedProject = (project: ProjectDoc) => project.featured;
 
-const isGithubLink = (link: string) =>
-  link.toLowerCase().includes("github.com");
+const getProjectPlatform = (project: ProjectDoc): Exclude<ProjectFilter, "all"> =>
+  project.type === "Mobile App" ? "mobile" : "web";
 
-function ToolLogo({ name }: { name: string }) {
+const getFilterLabel = (filter: ProjectFilter) =>
+  projectFilters.find((item) => item.value === filter)?.label ?? "--all";
+
+function ToolBadge({ name }: { name: string }) {
   const meta = getToolMeta(name);
-
-  if (!meta) {
-    return (
-      <span
-        title={name}
-        aria-label={name}
-        className="grid h-9 w-9 place-items-center rounded-full border border-white/10 bg-white/[0.055] text-[#C8BEFF] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition duration-300 hover:-translate-y-0.5 hover:border-[#8D78FF]/35 hover:bg-[#7257FF]/16"
-      >
-        <IconCode size={16} stroke={1.7} aria-hidden="true" />
-      </span>
-    );
-  }
-
-  const { Icon, color } = meta;
 
   return (
     <span
       title={name}
-      aria-label={name}
-      className="grid h-9 w-9 place-items-center rounded-full border border-white/10 bg-white/[0.055] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition duration-300 hover:-translate-y-0.5 hover:border-[#8D78FF]/35 hover:bg-[#7257FF]/16"
+      className="theme-shadow inline-flex h-9 max-w-full items-center gap-2 rounded-full border border-contrast/10 bg-contrast/[0.055] px-3 text-ink-badge shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition duration-300 hover:-translate-y-0.5 hover:border-[#8D78FF]/35 hover:bg-[#7257FF]/16"
     >
-      <Icon className="h-[17px] w-[17px]" style={{ color }} aria-hidden="true" />
+      {meta ? (
+        <meta.Icon
+          className="technology-icon h-4 w-4 shrink-0"
+          style={{ color: meta.color }}
+          aria-hidden="true"
+        />
+      ) : (
+        <IconCode
+          className="h-4 w-4 shrink-0 text-theme-accent"
+          stroke={1.7}
+          aria-hidden="true"
+        />
+      )}
+      <span className="max-w-36 truncate text-xs font-medium">{name}</span>
     </span>
   );
 }
@@ -202,17 +217,17 @@ function ProjectSkeleton() {
       {Array.from({ length: 6 }).map((_, index) => (
         <div
           key={index}
-          className="overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.035] p-3"
+          className="overflow-hidden rounded-[28px] border border-contrast/10 bg-contrast/[0.035] p-3"
         >
-          <div className="h-56 rounded-[22px] bg-gradient-to-r from-[#17162A] via-[#211B3B] to-[#17162A] bg-[length:220%_100%] animate-[project-shimmer_1.6s_infinite]" />
+          <div className="h-56 rounded-[22px] bg-gradient-to-r from-surface-skeleton via-surface-skeleton-highlight to-surface-skeleton bg-[length:220%_100%] animate-[project-shimmer_1.6s_infinite]" />
           <div className="px-2 pb-2 pt-5">
-            <div className="h-4 w-20 rounded-full bg-gradient-to-r from-[#17162A] via-[#211B3B] to-[#17162A] bg-[length:220%_100%] animate-[project-shimmer_1.6s_infinite]" />
-            <div className="mt-4 h-7 w-3/4 rounded-full bg-gradient-to-r from-[#17162A] via-[#211B3B] to-[#17162A] bg-[length:220%_100%] animate-[project-shimmer_1.6s_infinite]" />
+            <div className="h-4 w-20 rounded-full bg-gradient-to-r from-surface-skeleton via-surface-skeleton-highlight to-surface-skeleton bg-[length:220%_100%] animate-[project-shimmer_1.6s_infinite]" />
+            <div className="mt-4 h-7 w-3/4 rounded-full bg-gradient-to-r from-surface-skeleton via-surface-skeleton-highlight to-surface-skeleton bg-[length:220%_100%] animate-[project-shimmer_1.6s_infinite]" />
             <div className="mt-5 flex gap-2">
               {Array.from({ length: 4 }).map((_, toolIndex) => (
                 <div
                   key={toolIndex}
-                  className="h-9 w-9 rounded-full bg-gradient-to-r from-[#17162A] via-[#211B3B] to-[#17162A] bg-[length:220%_100%] animate-[project-shimmer_1.6s_infinite]"
+                  className="h-9 w-9 rounded-full bg-gradient-to-r from-surface-skeleton via-surface-skeleton-highlight to-surface-skeleton bg-[length:220%_100%] animate-[project-shimmer_1.6s_infinite]"
                 />
               ))}
             </div>
@@ -225,18 +240,18 @@ function ProjectSkeleton() {
 
 function ProjectCard({ project, index }: { project: ProjectDoc; index: number }) {
   const tools = splitTools(project.tools);
-  const detailHref = `/projects/${project.id ?? slugify(project.title)}`;
-  const externalLabel = isGithubLink(project.link) ? "GitHub" : "Preview";
-  const ExternalIcon = isGithubLink(project.link)
-    ? IconBrandGithub
-    : IconExternalLink;
+  const detailHref = project.id ? `/projects/${project.id}` : undefined;
+  const links = projectLinks(project);
+  const externalUrl = links.demoUrl || links.repoUrl;
+  const externalLabel = links.demoUrl ? "Preview" : "GitHub";
+  const ExternalIcon = links.demoUrl ? IconExternalLink : IconBrandGithub;
 
   return (
     <article
       data-aos="fade-up"
       data-aos-duration="750"
-      data-aos-delay={(index % projectsPerPage) * 65}
-      className="project-card group relative overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.035] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_24px_80px_rgba(10,4,35,0.22)] backdrop-blur-xl transition duration-500 hover:-translate-y-1.5 hover:border-[#8D78FF]/40 hover:bg-white/[0.055]"
+      data-aos-delay={(index % gridProjectsPerPage) * 65}
+      className="theme-shadow project-card group relative overflow-hidden rounded-[28px] border border-contrast/10 bg-contrast/[0.035] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_24px_80px_rgba(10,4,35,0.22)] backdrop-blur-xl transition duration-500 hover:-translate-y-1.5 hover:border-[#8D78FF]/40 hover:bg-contrast/[0.055]"
       style={{ animationDelay: `${(index % 5) * 0.45}s` }}
     >
       <div
@@ -248,15 +263,15 @@ function ProjectCard({ project, index }: { project: ProjectDoc; index: number })
         aria-hidden="true"
       />
 
-      <div className="relative overflow-hidden rounded-[22px] border border-white/10 bg-[#0E0E18]">
+      <div className="relative overflow-hidden rounded-[22px] border border-contrast/10 bg-surface-page">
         {project.image ? (
-          <img
+          <SafeImage
             src={project.image}
             alt={`${project.title} project preview`}
             className="h-56 w-full object-cover transition duration-700 group-hover:scale-[1.045] sm:h-64"
           />
         ) : (
-          <div className="flex h-56 w-full items-center justify-center bg-[#171625] text-[#8F8AA0] sm:h-64">
+          <div className="flex h-56 w-full items-center justify-center bg-surface-image-placeholder text-ink-muted sm:h-64">
             <IconPhoto size={32} stroke={1.5} aria-hidden="true" />
           </div>
         )}
@@ -271,11 +286,11 @@ function ProjectCard({ project, index }: { project: ProjectDoc; index: number })
 
       <div className="relative px-2 pb-2 pt-5">
         <div className="flex items-start justify-between gap-4">
-          <h3 className="text-xl font-semibold leading-tight tracking-[-0.025em] text-white sm:text-2xl">
+          <h3 className="text-xl font-semibold leading-tight tracking-[-0.025em] text-foreground sm:text-2xl">
             {project.title}
           </h3>
           <span
-            className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.045] text-[#D8D1FF] transition duration-300 group-hover:rotate-12 group-hover:border-[#8D78FF]/35 group-hover:bg-[#7257FF]/20"
+            className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-contrast/10 bg-contrast/[0.045] text-theme-accent transition duration-300 group-hover:rotate-12 group-hover:border-[#8D78FF]/35 group-hover:bg-[#7257FF]/20"
             aria-hidden="true"
           >
             <IconArrowUpRight size={17} stroke={1.7} />
@@ -284,37 +299,133 @@ function ProjectCard({ project, index }: { project: ProjectDoc; index: number })
 
         {tools.length > 0 && (
           <div className="mt-5 flex flex-wrap gap-2">
-            {tools.slice(0, 7).map((tool) => (
-              <ToolLogo key={`${project.title}-${tool}`} name={tool} />
+            {tools.slice(0, 4).map((tool) => (
+              <ToolBadge key={`${project.title}-${tool}`} name={tool} />
             ))}
-            {tools.length > 7 && (
+            {tools.length > 4 && (
               <span
-                title={tools.slice(7).join(", ")}
-                className="grid h-9 min-w-9 place-items-center rounded-full border border-[#8D78FF]/20 bg-[#7257FF]/12 px-2 text-[11px] font-semibold text-[#C8BEFF]"
+                title={tools.slice(4).join(", ")}
+                aria-label={`${tools.length - 4} more technologies: ${tools.slice(4).join(", ")}`}
+                className="inline-flex h-9 items-center rounded-full border border-[#8D78FF]/20 bg-[#7257FF]/12 px-3 text-xs font-semibold text-theme-accent"
               >
-                +{tools.length - 7}
+                +{tools.length - 4} more
               </span>
             )}
           </div>
         )}
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          <a
+          {detailHref && <a
             href={detailHref}
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[#8D78FF]/25 bg-[#7257FF]/18 px-4 py-2.5 text-sm font-semibold text-white transition duration-300 hover:border-[#B7AAFF]/45 hover:bg-[#7257FF]/28 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#8D78FF]/25 active:translate-y-px"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-[#8D78FF]/25 bg-[#7257FF]/18 px-4 py-2.5 text-sm font-semibold text-foreground transition duration-300 hover:border-[#B7AAFF]/45 hover:bg-[#7257FF]/28 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#8D78FF]/25 active:translate-y-px"
           >
             View detail
             <IconArrowRight size={16} stroke={1.7} aria-hidden="true" />
-          </a>
-          <a
-            href={project.link}
+          </a>}
+          {externalUrl && <a
+            href={externalUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.045] px-4 py-2.5 text-sm font-semibold text-[#F0EEF6] transition duration-300 hover:border-[#8D78FF]/35 hover:bg-white/[0.07] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#8D78FF]/20 active:translate-y-px"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-contrast/10 bg-contrast/[0.045] px-4 py-2.5 text-sm font-semibold text-ink-strong transition duration-300 hover:border-[#8D78FF]/35 hover:bg-contrast/[0.07] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#8D78FF]/20 active:translate-y-px"
           >
             <ExternalIcon size={16} stroke={1.7} aria-hidden="true" />
             {externalLabel}
-          </a>
+          </a>}
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function FeaturedProject({ project }: { project: ProjectDoc }) {
+  const tools = splitTools(project.tools);
+  const detailHref = project.id ? `/projects/${project.id}` : undefined;
+  const links = projectLinks(project);
+  const externalUrl = links.demoUrl || links.repoUrl;
+  const externalLabel = links.demoUrl ? "Preview" : "GitHub";
+  const ExternalIcon = links.demoUrl ? IconExternalLink : IconBrandGithub;
+
+  return (
+    <article
+      data-aos="fade-up"
+      data-aos-duration="800"
+      className="theme-shadow group relative overflow-hidden rounded-[30px] border border-[#8D78FF]/20 bg-surface-featured/76 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_34px_110px_rgba(10,4,35,0.34)] backdrop-blur-xl lg:p-4"
+    >
+      <div
+        className="pointer-events-none absolute -left-28 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full bg-[#7257FF]/24 blur-[110px] transition duration-700 group-hover:bg-[#8D78FF]/30"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-[#2B0780]/28 blur-[110px]"
+        aria-hidden="true"
+      />
+
+      <div className="relative grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(20rem,0.9fr)] lg:items-stretch">
+        <div className="relative min-h-72 overflow-hidden rounded-[24px] border border-contrast/10 bg-surface-page sm:min-h-[26rem] lg:min-h-[30rem]">
+          {project.image ? (
+            <SafeImage
+              src={project.image}
+              alt={`${project.title} flagship project preview`}
+              eager
+              className="h-full min-h-72 w-full object-cover transition duration-700 group-hover:scale-[1.025] sm:min-h-[26rem] lg:min-h-[30rem]"
+            />
+          ) : (
+            <div className="flex h-full min-h-72 w-full items-center justify-center bg-surface-image-placeholder text-ink-muted sm:min-h-[26rem] lg:min-h-[30rem]">
+              <IconPhoto size={40} stroke={1.5} aria-hidden="true" />
+            </div>
+          )}
+          <div
+            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0B0B15]/86 via-transparent to-[#0B0B15]/12"
+            aria-hidden="true"
+          />
+        </div>
+
+        <div className="relative flex flex-col justify-center px-2 pb-3 pt-1 sm:px-4 lg:px-4">
+          <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-theme-accent">
+            FLAGSHIP PROJECT
+          </p>
+          <h3 className="mt-4 text-[clamp(2.75rem,6vw,5.75rem)] font-bold leading-[0.94] tracking-[-0.04em] text-foreground">
+            {project.title}
+          </h3>
+          <p className="mt-6 max-w-xl text-pretty text-sm leading-7 text-ink-description md:text-[15px]">
+            {project.description || "Explore the project details, technology, and available links."}
+          </p>
+
+          {tools.length > 0 && (
+            <div className="mt-7 flex flex-wrap gap-2.5">
+              {tools.slice(0, 4).map((tool) => (
+                <ToolBadge key={`featured-${project.title}-${tool}`} name={tool} />
+              ))}
+              {tools.length > 4 && (
+                <span
+                  title={tools.slice(4).join(", ")}
+                  aria-label={`${tools.length - 4} more technologies: ${tools.slice(4).join(", ")}`}
+                  className="inline-flex h-9 items-center rounded-full border border-[#8D78FF]/20 bg-[#7257FF]/12 px-3 text-xs font-semibold text-theme-accent"
+                >
+                  +{tools.length - 4} more
+                </span>
+              )}
+            </div>
+          )}
+
+          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:max-w-md">
+            {detailHref && <a
+              href={detailHref}
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-[#8D78FF]/30 bg-[#7257FF]/24 px-5 py-3 text-sm font-semibold text-foreground transition duration-300 hover:border-[#B7AAFF]/50 hover:bg-[#7257FF]/34 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#8D78FF]/25 active:translate-y-px"
+            >
+              View detail
+              <IconArrowRight size={16} stroke={1.7} aria-hidden="true" />
+            </a>}
+            {externalUrl && <a
+              href={externalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-contrast/10 bg-contrast/[0.045] px-5 py-3 text-sm font-semibold text-ink-strong transition duration-300 hover:border-[#8D78FF]/35 hover:bg-contrast/[0.07] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#8D78FF]/20 active:translate-y-px"
+            >
+              <ExternalIcon size={16} stroke={1.7} aria-hidden="true" />
+              {externalLabel}
+            </a>}
+          </div>
         </div>
       </div>
     </article>
@@ -325,23 +436,49 @@ export default function Project() {
   const [projects, setProjects] = useState<ProjectDoc[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
+  const [activeFilter, setActiveFilter] = useState<ProjectFilter>("all");
+  const [loadError, setLoadError] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
     getProjects()
       .then(setProjects)
+      .catch(() => setLoadError(true))
       .finally(() => setLoading(false));
   }, []);
 
-  const totalPages = Math.ceil(projects.length / projectsPerPage);
-  const indexOfLast = currentPage * projectsPerPage;
-  const indexOfFirst = indexOfLast - projectsPerPage;
-  const currentItems = projects.slice(indexOfFirst, indexOfLast);
+  const featuredProject = useMemo(
+    () => projects.find((project) => isFeaturedProject(project)),
+    [projects]
+  );
+  const archiveProjects = useMemo(
+    () => projects.filter((project) => !isFeaturedProject(project)),
+    [projects]
+  );
+  const filteredProjects = useMemo(() => {
+    if (activeFilter === "all") {
+      return archiveProjects;
+    }
+
+    return archiveProjects.filter(
+      (project) => getProjectPlatform(project) === activeFilter
+    );
+  }, [activeFilter, archiveProjects]);
+
+  const totalPages = Math.ceil(filteredProjects.length / gridProjectsPerPage);
+  const indexOfLast = currentPage * gridProjectsPerPage;
+  const indexOfFirst = indexOfLast - gridProjectsPerPage;
+  const currentItems = filteredProjects.slice(indexOfFirst, indexOfLast);
 
   useEffect(() => {
     if (currentPage > totalPages && totalPages > 0) {
       setCurrentPage(totalPages);
     }
   }, [currentPage, totalPages]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeFilter]);
 
   const paginate = (page: number) => setCurrentPage(page);
   const nextPage = () =>
@@ -351,7 +488,7 @@ export default function Project() {
   return (
     <section
       id="project"
-      className="relative overflow-hidden bg-[#131320] px-5 py-24 font-sans sm:px-8 md:px-16 md:py-32 lg:px-24 xl:px-32"
+      className="relative overflow-hidden bg-surface-section px-5 py-24 font-sans sm:px-8 md:px-16 md:py-32 lg:px-24 xl:px-32"
     >
       <style jsx global>{`
         @keyframes project-shimmer {
@@ -432,7 +569,7 @@ export default function Project() {
         aria-hidden="true"
       />
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#0E0E18] to-transparent"
+        className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-surface-page to-transparent"
         aria-hidden="true"
       />
 
@@ -442,13 +579,13 @@ export default function Project() {
           data-aos-duration="700"
           className="mx-auto max-w-3xl text-center"
         >
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8D78FF]">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-theme-accent">
             Projects
           </p>
-          <h2 className="mt-4 text-balance text-[clamp(2.65rem,5.6vw,5.6rem)] font-bold leading-[1.02] tracking-[-0.055em] text-white">
+          <h2 className="mt-4 text-balance text-[clamp(2.65rem,5.6vw,5.6rem)] font-bold leading-[1.02] tracking-[-0.04em] text-foreground">
             Selected work, built with care.
           </h2>
-          <p className="mx-auto mt-6 max-w-2xl text-pretty text-sm leading-7 text-[#A9A4B7] md:text-[15px]">
+          <p className="mx-auto mt-6 max-w-2xl text-pretty text-sm leading-7 text-ink-secondary md:text-[15px]">
             A closer look at web and mobile products I have designed,
             developed, and shipped using modern frontend and full-stack tools.
           </p>
@@ -457,52 +594,117 @@ export default function Project() {
         <div
           data-aos="fade-up"
           data-aos-duration="750"
-          className="mx-auto mt-12 max-w-4xl border-y border-white/10 py-4 sm:mt-14"
+          className="mx-auto mt-12 max-w-4xl border-y border-contrast/10 py-4 sm:mt-14"
         >
-          <div className="flex flex-col items-center justify-center gap-3 text-center text-sm text-[#A9A4B7] sm:flex-row sm:gap-4">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.045] text-[#D8D1FF]">
+          <div className="flex flex-col items-center justify-center gap-3 text-center text-sm text-ink-secondary sm:flex-row sm:gap-4">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full border border-contrast/10 bg-contrast/[0.045] text-theme-accent">
               <IconFolderOpen size={18} stroke={1.6} aria-hidden="true" />
             </span>
             <span>
               {loading
                 ? "Loading project archive"
-                : `${projects.length} project${projects.length === 1 ? "" : "s"} in the archive`}
+                : `${archiveProjects.length} archive project${
+                    archiveProjects.length === 1 ? "" : "s"
+                  }${featuredProject ? " plus 1 flagship" : ""}`}
             </span>
             <span className="hidden h-1 w-1 rounded-full bg-[#8D78FF]/70 sm:block" />
-            <span className="text-xs font-medium uppercase tracking-[0.16em] text-[#8F8AA0]">
-              Showing 10 per page
+            <span className="text-xs font-medium uppercase tracking-[0.16em] text-ink-muted">
+              Showing 6 per page
             </span>
           </div>
         </div>
 
+        {!loading && featuredProject && (
+          <div className="mt-12 sm:mt-16">
+            <FeaturedProject project={featuredProject} />
+          </div>
+        )}
+
+        {!loading && archiveProjects.length > 0 && (
+          <div
+            data-aos="fade-up"
+            data-aos-duration="650"
+            className="mt-12 flex flex-col gap-4 border-t border-contrast/10 pt-8 sm:mt-14 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <div>
+              <p className="font-mono text-xs text-theme-accent">
+                filter projects {getFilterLabel(activeFilter)}
+              </p>
+              <p className="mt-2 text-sm text-ink-secondary">
+                {filteredProjects.length} result
+                {filteredProjects.length === 1 ? "" : "s"} in this view
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {projectFilters.map((filter) => {
+                const isActive = activeFilter === filter.value;
+
+                return (
+                  <button
+                    key={filter.value}
+                    type="button"
+                    onClick={() => setActiveFilter(filter.value)}
+                    className={`min-h-10 rounded-full border px-4 font-mono text-xs font-semibold transition duration-300 focus:outline-none focus-visible:ring-4 focus-visible:ring-[#8D78FF]/20 active:translate-y-px ${
+                      isActive
+                        ? "border-[#8D78FF]/50 bg-[#7257FF]/24 text-foreground shadow-[0_0_28px_rgba(114,87,255,0.28)]"
+                        : "border-contrast/10 bg-contrast/[0.04] text-ink-secondary hover:border-[#8D78FF]/35 hover:bg-contrast/[0.07] hover:text-theme-accent"
+                    }`}
+                    aria-pressed={isActive}
+                  >
+                    {filter.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         <div className="mt-8 sm:mt-10">
           {loading ? (
             <ProjectSkeleton />
-          ) : currentItems.length > 0 ? (
-            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-              {currentItems.map((project, index) => (
-                <ProjectCard
-                  key={project.id ?? `${project.title}-${index}`}
-                  project={project}
-                  index={index}
-                />
-              ))}
+          ) : loadError ? (
+            <div role="alert" className="rounded-[28px] border border-red-400/20 bg-red-400/[0.06] px-6 py-14 text-center text-red-800 dark:text-red-100">
+              Projects could not be loaded. Please refresh the page and try again.
             </div>
+          ) : currentItems.length > 0 ? (
+            <motion.div
+              layout
+              className="grid gap-5 md:grid-cols-2 xl:grid-cols-3"
+            >
+              <AnimatePresence mode="popLayout">
+                {currentItems.map((project, index) => (
+                  <motion.div
+                    key={project.id ?? `${project.title}-${index}`}
+                    layout
+                    initial={
+                      prefersReducedMotion ? false : { opacity: 0, y: 18 }
+                    }
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={
+                      prefersReducedMotion ? undefined : { opacity: 0, y: -12 }
+                    }
+                    transition={{ duration: 0.28, ease: "easeOut" }}
+                  >
+                    <ProjectCard project={project} index={index} />
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
           ) : (
             <div
               data-aos="fade-up"
               data-aos-duration="700"
-              className="rounded-[28px] border border-white/10 bg-white/[0.035] px-6 py-14 text-center backdrop-blur-xl"
+              className="rounded-[28px] border border-contrast/10 bg-contrast/[0.035] px-6 py-14 text-center backdrop-blur-xl"
             >
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-white/[0.045] text-[#D8D1FF]">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-contrast/10 bg-contrast/[0.045] text-theme-accent">
                 <IconFolderOpen size={24} stroke={1.6} aria-hidden="true" />
               </div>
-              <h3 className="mt-5 text-xl font-semibold text-white">
-                No projects yet
+              <h3 className="mt-5 text-xl font-semibold text-foreground">
+                No projects found
               </h3>
-              <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-[#A9A4B7]">
-                Add projects from the dashboard and they will appear here with
-                images, tools, and links.
+              <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-ink-secondary">
+                Try another project type or add more projects from the
+                dashboard.
               </p>
             </div>
           )}
@@ -511,9 +713,10 @@ export default function Project() {
         {!loading && totalPages > 1 && (
           <div className="mt-10 flex flex-wrap items-center justify-center gap-2">
             <button
+              type="button"
               onClick={prevPage}
               disabled={currentPage === 1}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.045] px-4 text-sm font-semibold text-white transition hover:border-[#8D78FF]/35 hover:bg-white/[0.07] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#8D78FF]/20 disabled:pointer-events-none disabled:opacity-40"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-contrast/10 bg-contrast/[0.045] px-4 text-sm font-semibold text-foreground transition hover:border-[#8D78FF]/35 hover:bg-contrast/[0.07] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#8D78FF]/20 disabled:pointer-events-none disabled:opacity-40"
             >
               <IconArrowLeft size={16} stroke={1.7} aria-hidden="true" />
               Prev
@@ -521,21 +724,24 @@ export default function Project() {
             {Array.from({ length: totalPages }, (_, index) => (
               <button
                 key={index + 1}
+                type="button"
                 onClick={() => paginate(index + 1)}
                 className={`h-11 min-w-11 rounded-full px-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-4 focus-visible:ring-[#8D78FF]/20 ${
                   currentPage === index + 1
                     ? "bg-[#7257FF] text-white shadow-[0_0_28px_rgba(114,87,255,0.35)]"
-                    : "border border-white/10 bg-white/[0.045] text-[#D8D1FF] hover:border-[#8D78FF]/35 hover:bg-white/[0.07]"
+                    : "border border-contrast/10 bg-contrast/[0.045] text-theme-accent hover:border-[#8D78FF]/35 hover:bg-contrast/[0.07]"
                 }`}
                 aria-label={`Go to project page ${index + 1}`}
+                aria-current={currentPage === index + 1 ? "page" : undefined}
               >
                 {index + 1}
               </button>
             ))}
             <button
+              type="button"
               onClick={nextPage}
               disabled={currentPage === totalPages}
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-white/10 bg-white/[0.045] px-4 text-sm font-semibold text-white transition hover:border-[#8D78FF]/35 hover:bg-white/[0.07] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#8D78FF]/20 disabled:pointer-events-none disabled:opacity-40"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-contrast/10 bg-contrast/[0.045] px-4 text-sm font-semibold text-foreground transition hover:border-[#8D78FF]/35 hover:bg-contrast/[0.07] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#8D78FF]/20 disabled:pointer-events-none disabled:opacity-40"
             >
               Next
               <IconArrowRight size={16} stroke={1.7} aria-hidden="true" />

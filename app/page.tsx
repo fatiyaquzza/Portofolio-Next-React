@@ -1,193 +1,102 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import AosInitializer from "./components/AosInitializer";
 import Cform from "./Cform";
 import Contact from "./Contact";
 import Experience from "./Experience";
 import HomeAboutTransition from "./HomeAboutTransition";
 import Project from "./Project";
-import SplashScreen from "./SplashScreen";
 import TechStack from "./TechStack";
-import AosInitializer from "./components/AosInitializer";
-import { useEffect, useState } from "react";
+import ThemeToggle from "./components/ThemeToggle";
+
+const navigation = [
+  ["Home", "#home"],
+  ["About", "#about"],
+  ["Experience", "#experience"],
+  ["Skills", "#skills"],
+  ["Project", "#project"],
+  ["Contact", "#contact"],
+] as const;
 
 export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showTopBtn, setShowTopBtn] = useState(false);
-
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const [showTopButton, setShowTopButton] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setShowTopBtn(window.scrollY > 300);
-    };
-    window.addEventListener("scroll", handleScroll);
+    const handleScroll = () => setShowTopButton(window.scrollY > 300);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleScrollTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsMenuOpen(false);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [isMenuOpen]);
+
+  const scrollTop = () => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" });
   };
 
   return (
-    <div className="min-h-[200vh] overflow-x-clip bg-[#131320] scroll-smooth">
-      <SplashScreen />
+    <div className="min-h-screen overflow-x-clip bg-surface-section">
+      <a href="#main-content" className="fixed left-4 top-3 z-[2000] -translate-y-20 rounded-lg bg-white px-4 py-2 font-semibold text-black transition focus:translate-y-0">
+        Skip to content
+      </a>
       <AosInitializer />
-      <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[999] w-full px-4">
-        <div className="backdrop-blur-lg bg-white/5 border border-white/10 px-8 py-3 rounded-full flex items-center justify-between max-w-screen-lg mx-auto">
-          {/* Left: Logo */}
-          <span className="text-white font-semibold flex items-center gap-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-5 h-5 text-[#6184DC]"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 6v6l4 2"
-              />
-            </svg>
+      <header className="fixed left-1/2 top-6 z-[999] w-full -translate-x-1/2 px-4">
+        <nav aria-label="Primary navigation" className="theme-shadow mx-auto flex max-w-screen-lg items-center justify-between rounded-full border border-contrast/10 bg-surface-navbar/75 px-6 py-3 shadow-lg backdrop-blur-xl sm:px-8">
+          <a href="#home" className="flex min-h-11 items-center gap-2 font-semibold text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9B89FF]">
+            <svg aria-hidden="true" className="h-5 w-5 text-[#6184DC]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6l4 2" /></svg>
             FATIYA.
-          </span>
+          </a>
 
-          {/* Right: Menu */}
-          <div className="hidden md:flex gap-6 text-white text-sm font-medium">
-            <a href="#home" className="hover:text-[#6184DC] transition">
-              Home
-            </a>
-            <a href="#about" className="hover:text-[#6184DC] transition">
-              About
-            </a>
-            <a href="#experience" className="hover:text-[#6184DC] transition">
-              Experience
-            </a>
-            <a href="#skills" className="hover:text-[#6184DC] transition">
-              Skills
-            </a>
-            <a href="#project" className="hover:text-[#6184DC] transition">
-              Project
-            </a>
-            <a href="#contact" className="hover:text-[#6184DC] transition">
-              Contact
-            </a>
+          <div className="hidden gap-4 text-sm font-medium text-foreground md:flex">
+            {navigation.map(([label, href]) => <a key={href} href={href} className="rounded-sm transition hover:text-theme-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#9B89FF]">{label}</a>)}
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center">
-            <button
-              onClick={toggleMenu}
-              className="text-white focus:outline-none"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                {isMenuOpen ? (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                ) : (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                )}
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Menu Content */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-white/5 backdrop-blur-lg border border-white/10 rounded-md mt-2 py-2 px-4 space-y-2 text-white text-sm font-medium">
-            <a
-              href="#home"
-              className="block hover:text-[#6184DC] transition"
-              onClick={toggleMenu}
-            >
-              Home
-            </a>
-            <a
-              href="#about"
-              className="block hover:text-[#6184DC] transition"
-              onClick={toggleMenu}
-            >
-              About
-            </a>
-            <a
-              href="#experience"
-              className="block hover:text-[#6184DC] transition"
-              onClick={toggleMenu}
-            >
-              Experience
-            </a>
-            <a
-              href="#skills"
-              className="block hover:text-[#6184DC] transition"
-              onClick={toggleMenu}
-            >
-              Skills
-            </a>
-            <a
-              href="#project"
-              className="block hover:text-[#6184DC] transition"
-              onClick={toggleMenu}
-            >
-              Project
-            </a>
-            <a
-              href="#contact"
-              className="block hover:text-[#6184DC] transition"
-              onClick={toggleMenu}
-            >
-              Contact
-            </a>
-          </div>
-        )}
-      </div>
-
-      <HomeAboutTransition />
-
-      <Experience />
-
-      <TechStack />
-
-      <Project />
-
-      <Contact />
-
-      <Cform />
-
-      {showTopBtn && (
-        <button
-          onClick={handleScrollTop}
-          className="fixed bottom-16 right-6 z-[1000] bg-[#6311E1] to-[#2B0780] transform -translate-x-1/2 hover:bg-[#2B0780] text-white p-3 rounded-full shadow-lg transition-all duration-300 animate-bounce"
-          aria-label="Scroll to top"
-        >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            viewBox="0 0 24 24"
+          <div className="flex items-center gap-1">
+          <ThemeToggle />
+          <button
+            type="button"
+            onClick={() => setIsMenuOpen((open) => !open)}
+            className="grid min-h-11 min-w-11 place-items-center rounded-full text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9B89FF] md:hidden"
+            aria-label={isMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-navigation"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M5 15l7-7 7 7"
-            />
-          </svg>
+            <svg aria-hidden="true" className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+            </svg>
+          </button>
+          </div>
+        </nav>
+
+        {isMenuOpen && (
+          <nav id="mobile-navigation" aria-label="Mobile navigation" className="theme-shadow mx-auto mt-2 max-w-screen-lg space-y-1 rounded-2xl border border-contrast/10 bg-surface-navbar/95 p-3 text-sm font-medium text-foreground shadow-xl backdrop-blur-xl md:hidden">
+            {navigation.map(([label, href]) => <a key={href} href={href} onClick={() => setIsMenuOpen(false)} className="block min-h-11 rounded-xl px-4 py-3 transition hover:bg-contrast/[0.06] hover:text-theme-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#9B89FF]">{label}</a>)}
+          </nav>
+        )}
+      </header>
+
+      <main id="main-content">
+        <HomeAboutTransition />
+        <Experience />
+        <TechStack />
+        <Project />
+        <Contact />
+        <Cform />
+      </main>
+
+      {showTopButton && (
+        <button type="button" onClick={scrollTop} className="theme-shadow fixed bottom-6 right-6 z-[1000] grid min-h-11 min-w-11 place-items-center rounded-full bg-[#6311E1] text-white shadow-lg transition hover:bg-[#7257FF] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#B7AAFF] motion-reduce:animate-none text-white" aria-label="Scroll to top">
+          <svg aria-hidden="true" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" /></svg>
         </button>
       )}
     </div>

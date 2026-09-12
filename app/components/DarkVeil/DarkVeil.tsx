@@ -94,8 +94,11 @@ export default function DarkVeil({
 }: Props) {
   const ref = useRef<HTMLCanvasElement>(null);
   useEffect(() => {
-    const canvas = ref.current as HTMLCanvasElement;
-    const parent = canvas.parentElement as HTMLElement;
+    const canvas = ref.current;
+    const parent = canvas?.parentElement;
+    if (!canvas || !parent) return;
+
+    try {
 
     const renderer = new Renderer({
       dpr: Math.min(window.devicePixelRatio, 2),
@@ -125,16 +128,18 @@ export default function DarkVeil({
       const w = parent.clientWidth,
         h = parent.clientHeight;
       renderer.setSize(w * resolutionScale, h * resolutionScale);
-      program.uniforms.uResolution.value.set(w, h);
+      program.uniforms.uResolution.value.set(gl.drawingBufferWidth, gl.drawingBufferHeight);
     };
 
-    window.addEventListener("resize", resize);
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(parent);
     resize();
 
     const start = performance.now();
     let frame = 0;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-    const loop = () => {
+    const render = () => {
       program.uniforms.uTime.value =
         ((performance.now() - start) / 1000) * speed;
       program.uniforms.uHueShift.value = hueShift;
@@ -143,15 +148,35 @@ export default function DarkVeil({
       program.uniforms.uScanFreq.value = scanlineFrequency;
       program.uniforms.uWarp.value = warpAmount;
       renderer.render({ scene: mesh });
+    };
+
+    const loop = () => {
+      render();
       frame = requestAnimationFrame(loop);
     };
 
-    loop();
+    const updatePlayback = () => {
+      cancelAnimationFrame(frame);
+      if (document.hidden || reducedMotion.matches) {
+        if (!document.hidden) render();
+        return;
+      }
+      frame = requestAnimationFrame(loop);
+    };
+
+    document.addEventListener("visibilitychange", updatePlayback);
+    reducedMotion.addEventListener("change", updatePlayback);
+    updatePlayback();
 
     return () => {
       cancelAnimationFrame(frame);
-      window.removeEventListener("resize", resize);
+      document.removeEventListener("visibilitychange", updatePlayback);
+      reducedMotion.removeEventListener("change", updatePlayback);
+      resizeObserver.disconnect();
     };
+    } catch {
+      canvas.hidden = true;
+    }
   }, [
     hueShift,
     noiseIntensity,

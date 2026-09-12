@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable @typescript-eslint/no-explicit-any -- Rapier refs and meshline GLTF nodes do not expose complete compatible generics. */
+
 import { useEffect, useRef, useState } from "react";
 import { Canvas, extend, useThree, useFrame } from "@react-three/fiber";
 import {
@@ -146,12 +148,16 @@ function Band({ maxSpeed = 50, minSpeed = 0 }: BandProps) {
   }, [hovered, dragged]);
 
   useFrame((state, delta) => {
+    if (!fixed.current || !j1.current || !j2.current || !j3.current || !card.current || !band.current) {
+      return;
+    }
+    const safeDelta = Math.min(delta, 0.05);
     if (dragged && typeof dragged !== "boolean") {
       vec.set(state.pointer.x, state.pointer.y, 0.5).unproject(state.camera);
       dir.copy(vec).sub(state.camera.position).normalize();
       vec.add(dir.multiplyScalar(state.camera.position.length()));
-      [card, j1, j2, j3, fixed].forEach((ref) => ref.current?.wakeUp());
-      card.current?.setNextKinematicTranslation({
+      [card, j1, j2, j3, fixed].forEach((ref) => ref.current.wakeUp());
+      card.current.setNextKinematicTranslation({
         x: vec.x - dragged.x,
         y: vec.y - dragged.y,
         z: vec.z - dragged.z,
@@ -170,7 +176,7 @@ function Band({ maxSpeed = 50, minSpeed = 0 }: BandProps) {
         );
         ref.current.lerped.lerp(
           ref.current.translation(),
-          delta * (minSpeed + clampedDistance * (maxSpeed - minSpeed))
+          safeDelta * (minSpeed + clampedDistance * (maxSpeed - minSpeed))
         );
       });
       // Calculate curve
@@ -178,7 +184,10 @@ function Band({ maxSpeed = 50, minSpeed = 0 }: BandProps) {
       curve.points[1].copy(j2.current.lerped);
       curve.points[2].copy(j1.current.lerped);
       curve.points[3].copy(fixed.current.translation());
-      band.current.geometry.setPoints(curve.getPoints(32));
+      const points = curve.getPoints(32);
+      if (points.every((point) => Number.isFinite(point.x + point.y + point.z))) {
+        band.current.geometry.setPoints(points);
+      }
       // Tilt the card back
       ang.copy(card.current.angvel());
       rot.copy(card.current.rotation());
@@ -241,6 +250,8 @@ function Band({ maxSpeed = 50, minSpeed = 0 }: BandProps) {
               e.target.releasePointerCapture(e.pointerId);
               drag(false);
             }}
+            onPointerCancel={() => drag(false)}
+            onLostPointerCapture={() => drag(false)}
             onPointerDown={(e: any) => {
               e.target.setPointerCapture(e.pointerId);
               drag(
@@ -270,7 +281,7 @@ function Band({ maxSpeed = 50, minSpeed = 0 }: BandProps) {
         </RigidBody>
       </group>
       <mesh ref={band}>
-        <meshLineGeometry />
+        <meshLineGeometry points={[[0, 0, 0], [0, 0.01, 0]]} />
         <meshLineMaterial
           color="white"
           depthTest={false}

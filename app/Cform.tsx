@@ -1,13 +1,18 @@
 "use client";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 
 export default function Cform() {
   const [loading, setLoading] = useState(false);
+  const submittingRef = useRef(false);
+  const [status, setStatus] = useState<{ tone: "success" | "error"; text: string } | null>(null);
   const currentYear = new Date().getFullYear();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setLoading(true);
+    setStatus(null);
 
     const form = e.currentTarget;
     const formData = new FormData(form);
@@ -17,6 +22,7 @@ export default function Cform() {
       from_email: formData.get("email"),
       subject: formData.get("subject"),
       message: formData.get("message"),
+      website: formData.get("website"),
     };
 
     try {
@@ -31,31 +37,32 @@ export default function Cform() {
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.message);
-      alert("Email berhasil dikirim!");
+      setStatus({ tone: "success", text: "Email berhasil dikirim. Terima kasih!" });
       form.reset();
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Something went wrong";
-      alert("Gagal mengirim email: " + message);
+      setStatus({ tone: "error", text: "Gagal mengirim email: " + message });
     } finally {
+      submittingRef.current = false;
       setLoading(false);
     }
   };
 
   return (
-    <div className="mx-auto min-h-screen bg-[#131320] flex flex-col ">
-      <div id="contact" className="flex-grow flex justify-center items-center">
-        <div className="flex flex-col lg:flex-row bg-[#1C1C28] p-6 sm:p-8 rounded-xl shadow-lg max-w-5xl w-full">
+    <section id="contact" className="mx-auto flex min-h-screen scroll-mt-24 flex-col bg-surface-section">
+      <div className="flex flex-grow items-center justify-center">
+        <div className="theme-shadow flex flex-col lg:flex-row bg-surface-card p-6 sm:p-8 rounded-xl shadow-lg max-w-5xl w-full">
           {/* Left Section: Contact Info */}
           <div className="lg:w-1/2 pr-0 lg:pr-8 mb-6 lg:mb-0">
-            <h1 className="text-white font-semibold text-3xl sm:text-4xl md:text-5xl mb-4">
-              Let's Work <span className="text-[#6184DC]">Together</span>
-            </h1>
-            <p className="text-gray-400 mb-6 text-sm sm:text-base">
-              Please feel free to send me a message. I'll get in touch with you
+            <h2 className="text-foreground font-semibold text-3xl sm:text-4xl md:text-5xl mb-4">
+              Let&apos;s Work <span className="text-theme-blue">Together</span>
+            </h2>
+            <p className="text-ink-secondary mb-6 text-sm sm:text-base">
+              Please feel free to send me a message. I&apos;ll get in touch with you
               as soon as possible
             </p>
             <div className="space-y-3">
-              <div className="flex items-center text-white text-sm sm:text-base">
+              <div className="flex items-center text-foreground text-sm sm:text-base">
                 <svg
                   width="24"
                   height="24"
@@ -87,10 +94,14 @@ export default function Cform() {
           {/* Right Section: Form */}
           <div className="lg:w-1/2 pl-0 lg:pl-8">
             <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="absolute -left-[9999px]" aria-hidden="true">
+                <label htmlFor="website">Website</label>
+                <input id="website" name="website" tabIndex={-1} autoComplete="off" />
+              </div>
               {/* Name and Email */}
               <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
                 <div className="flex flex-col w-full sm:w-1/2">
-                  <label htmlFor="name" className="text-gray-400 mb-1 text-sm">
+                  <label htmlFor="name" className="text-ink-secondary mb-1 text-sm">
                     Name
                   </label>
                   <input
@@ -98,12 +109,14 @@ export default function Cform() {
                     id="name"
                     name="name"
                     required
-                    className="w-full bg-[#2D2D3A] border border-transparent text-white px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6010DD] placeholder-gray-500 text-sm sm:text-base"
+                    maxLength={100}
+                    autoComplete="name"
+                    className="w-full bg-surface-input-strong border border-transparent text-foreground px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6010DD] placeholder-gray-500 text-sm sm:text-base"
                     placeholder="Name"
                   />
                 </div>
                 <div className="flex flex-col w-full sm:w-1/2">
-                  <label htmlFor="email" className="text-gray-400 mb-1 text-sm">
+                  <label htmlFor="email" className="text-ink-secondary mb-1 text-sm">
                     Email
                   </label>
                   <input
@@ -111,7 +124,9 @@ export default function Cform() {
                     id="email"
                     name="email"
                     required
-                    className="w-full bg-[#2D2D3A] border border-transparent text-white px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6010DD] placeholder-gray-500 text-sm sm:text-base"
+                    maxLength={254}
+                    autoComplete="email"
+                    className="w-full bg-surface-input-strong border border-transparent text-foreground px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6010DD] placeholder-gray-500 text-sm sm:text-base"
                     placeholder="contact@email.com"
                   />
                 </div>
@@ -119,7 +134,7 @@ export default function Cform() {
 
               {/* Subject */}
               <div className="flex flex-col">
-                <label htmlFor="subject" className="text-gray-400 mb-1 text-sm">
+                <label htmlFor="subject" className="text-ink-secondary mb-1 text-sm">
                   Subject
                 </label>
                 <input
@@ -127,14 +142,15 @@ export default function Cform() {
                   id="subject"
                   name="subject"
                   required
-                  className="w-full bg-[#2D2D3A] border border-transparent text-white px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6010DD] placeholder-gray-500 text-sm sm:text-base"
+                  maxLength={160}
+                  className="w-full bg-surface-input-strong border border-transparent text-foreground px-4 py-3 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6010DD] placeholder-gray-500 text-sm sm:text-base"
                   placeholder="Subject"
                 />
               </div>
 
               {/* Message */}
               <div className="flex flex-col">
-                <label htmlFor="message" className="text-gray-400 mb-1 text-sm">
+                <label htmlFor="message" className="text-ink-secondary mb-1 text-sm">
                   Message
                 </label>
                 <textarea
@@ -142,7 +158,8 @@ export default function Cform() {
                   name="message"
                   rows={4}
                   required
-                  className="w-full bg-[#2D2D3A] border border-transparent text-white px-4 py-3 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-[#6010DD] placeholder-gray-500 text-sm sm:text-base"
+                  maxLength={5000}
+                  className="w-full bg-surface-input-strong border border-transparent text-foreground px-4 py-3 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-[#6010DD] placeholder-gray-500 text-sm sm:text-base"
                   placeholder="Please write your message..."
                 ></textarea>
               </div>
@@ -159,12 +176,20 @@ export default function Cform() {
               >
                 {loading ? "Sending..." : "Send Message"}
               </button>
+              {status && (
+                <p
+                  role={status.tone === "error" ? "alert" : "status"}
+                  className={`text-sm ${status.tone === "error" ? "text-red-800 dark:text-red-300" : "text-emerald-800 dark:text-emerald-300"}`}
+                >
+                  {status.text}
+                </p>
+              )}
             </form>
           </div>
         </div>
       </div>
       {/* Footer */}
-      <footer className="w-full bg-[#000000] py-3 px-4 flex justify-between items-center text-gray-400 text-sm ">
+      <footer className="w-full bg-surface-footer py-3 px-4 flex justify-between items-center text-ink-secondary text-sm ">
         <p className="mb-2 sm:mb-0">
           &copy; {currentYear} Fatiya Quzza. All Rights Reserved.
         </p>
@@ -173,9 +198,11 @@ export default function Cform() {
             href="https://www.instagram.com/fatiyaquzza/"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="Instagram"
             className="block p-2 rounded-full border border-gray-400 hover:border-[#6010DD] hover:text-[#6010DD] transition-colors"
           >
             <svg
+              aria-hidden="true"
               width="20"
               height="20"
               viewBox="0 0 24 24"
@@ -195,9 +222,11 @@ export default function Cform() {
             href="https://www.linkedin.com/in/fatiya-quzza"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="LinkedIn"
             className="block p-2 rounded-full border border-gray-400 hover:border-[#6010DD] hover:text-[#6010DD] transition-colors"
           >
             <svg
+              aria-hidden="true"
               width="20"
               height="20"
               viewBox="0 0 24 24"
@@ -217,9 +246,11 @@ export default function Cform() {
             href="https://github.com/fatiyaquzza"
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="GitHub"
             className="block p-2 rounded-full border border-gray-400 hover:border-[#6010DD] hover:text-[#6010DD] transition-colors"
           >
             <svg
+              aria-hidden="true"
               width="20"
               height="20"
               viewBox="0 0 24 24"
@@ -235,6 +266,6 @@ export default function Cform() {
           </a>
         </div>
       </footer>
-    </div>
+    </section>
   );
 }

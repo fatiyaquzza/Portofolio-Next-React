@@ -1,24 +1,32 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "../../context/AuthContext";
 import { FiTrendingUp } from "react-icons/fi";
 import { HiOutlineCube } from "react-icons/hi";
+import ThemeToggle from "@/app/components/ThemeToggle";
 
 export default function Dashboard() {
   const { signOut } = useAuth();
+  const [logoutError, setLogoutError] = useState<string | null>(null);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   const handleLogout = async () => {
+    if (loggingOut) return;
+    setLoggingOut(true);
+    setLogoutError(null);
     try {
       await signOut();
       window.location.href = "/login"; // redirect ke halaman login
-    } catch (err) {
-      alert("Gagal logout, coba lagi.");
+    } catch {
+      setLogoutError("Logout failed. Please try again.");
+      setLoggingOut(false);
     }
   };
 
   return (
-    <div className="relative min-h-screen bg-[#0B0F15] text-white overflow-hidden">
+    <div className="relative min-h-screen bg-surface-admin-page text-foreground overflow-hidden">
       {/* --- Dekorasi latar (glows + grid halus) --- */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <div
@@ -39,7 +47,7 @@ export default function Dashboard() {
       </div>
 
       {/* --- Header --- */}
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-[#0f1623]/70 backdrop-blur">
+      <header className="sticky top-0 z-40 border-b border-contrast/10 bg-surface-admin-nav/70 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           <h1 className="text-lg font-bold tracking-tight">
             <span className="bg-gradient-to-r from-[#6184DC] to-[#6311E1] bg-clip-text text-transparent">
@@ -48,11 +56,14 @@ export default function Dashboard() {
             Dashboard
           </h1>
           <nav className="flex items-center gap-3">
+            <ThemeToggle />
             <button
+              type="button"
               onClick={handleLogout}
-              className="rounded-lg bg-red-500/15 px-4 py-1.5 text-sm font-medium text-red-300 ring-1 ring-inset ring-red-400/20 transition hover:bg-red-500/25"
+              disabled={loggingOut}
+              className="rounded-lg bg-red-500/15 px-4 py-1.5 text-sm font-medium text-red-800 dark:text-red-300 ring-1 ring-inset ring-red-400/20 transition hover:bg-red-500/25"
             >
-              Logout
+              {loggingOut ? "Logging out…" : "Logout"}
             </button>
           </nav>
         </div>
@@ -60,13 +71,14 @@ export default function Dashboard() {
 
       {/* --- Main --- */}
       <main className="relative mx-auto max-w-6xl px-4 py-10">
+        {logoutError && <p role="alert" className="mb-6 rounded-xl border border-red-400/25 bg-red-400/10 px-4 py-3 text-sm text-red-800 dark:text-red-100">{logoutError}</p>}
         {/* Intro/hero kecil */}
         <div className="mb-8 flex items-center justify-between gap-4">
           <div>
             <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">
               Welcome, Admin
             </h2>
-            <p className="mt-1 text-sm text-gray-400">
+            <p className="mt-1 text-sm text-ink-secondary">
               Manage portfolio content through the two main modules below.
             </p>
           </div>
@@ -77,7 +89,7 @@ export default function Dashboard() {
           {/* Experiences Card */}
           <Link
             href="/dashboard/experiences"
-            className="group relative h-56 rounded-2xl border border-white/10 bg-[#101726]/80 p-6 shadow-2xl backdrop-blur-xl transition-transform duration-200 hover:scale-[1.01] hover:border-[#6184DC] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#6184DC]/30"
+            className="theme-shadow group relative h-56 rounded-2xl border border-contrast/10 bg-surface-admin-tile/80 p-6 shadow-2xl backdrop-blur-xl transition-transform duration-200 hover:scale-[1.01] hover:border-[#6184DC] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#6184DC]/30"
           >
             {/* ring gradient */}
             <span
@@ -90,11 +102,11 @@ export default function Dashboard() {
             <div className="relative flex h-full flex-col justify-between">
               <div className="flex items-center gap-3">
                 <div className="grid h-12 w-12 place-items-center rounded-xl bg-[#6184DC]/15 ring-1 ring-inset ring-[#6184DC]/30">
-                  <FiTrendingUp className="text-2xl text-[#89a6ff]" />
+                  <FiTrendingUp className="text-2xl text-theme-accent" />
                 </div>
                 <div>
                   <p className="text-lg font-semibold">Manage Experiences</p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-ink-secondary">
                     Add, edit, and delete experiences.
                   </p>
                 </div>
@@ -108,7 +120,7 @@ export default function Dashboard() {
           {/* Projects Card */}
           <Link
             href="/dashboard/projects"
-            className="group relative h-56 rounded-2xl border border-white/10 bg-[#101726]/80 p-6 shadow-2xl backdrop-blur-xl transition-transform duration-200 hover:scale-[1.01] hover:border-[#6184DC] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#6184DC]/30"
+            className="theme-shadow group relative h-56 rounded-2xl border border-contrast/10 bg-surface-admin-tile/80 p-6 shadow-2xl backdrop-blur-xl transition-transform duration-200 hover:scale-[1.01] hover:border-[#6184DC] focus:outline-none focus-visible:ring-4 focus-visible:ring-[#6184DC]/30"
           >
             {/* ring gradient */}
             <span
@@ -121,11 +133,11 @@ export default function Dashboard() {
             <div className="relative flex h-full flex-col justify-between">
               <div className="flex items-center gap-3">
                 <div className="grid h-12 w-12 place-items-center rounded-xl bg-[#6184DC]/15 ring-1 ring-inset ring-[#6184DC]/30">
-                  <HiOutlineCube className="text-2xl text-[#89a6ff]" />
+                  <HiOutlineCube className="text-2xl text-theme-accent" />
                 </div>
                 <div>
                   <p className="text-lg font-semibold">Manage Projects</p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-ink-secondary">
                     Add, edit, and delete projects.
                   </p>
                 </div>

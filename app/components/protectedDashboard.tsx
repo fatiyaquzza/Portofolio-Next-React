@@ -1,65 +1,83 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { hasAdminAccess } from "@/lib/adminAccess";
 
-export default function ProtectedDashboard({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+type AccessState = "idle" | "checking" | "allowed" | "denied" | "error";
+
+export default function ProtectedDashboard({ children }: { children: React.ReactNode }) {
   const { user, signOut } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const [checkingAccess, setCheckingAccess] = useState(false);
+  const isDashboard = pathname.startsWith("/dashboard");
+  const [state, setState] = useState<AccessState>("idle");
+  const [attempt, setAttempt] = useState(0);
 
-  const isDashboard = pathname?.startsWith("/dashboard");
+  const checkAccess = useCallback(() => setAttempt((value) => value + 1), []);
 
   useEffect(() => {
     if (!isDashboard) {
-      setCheckingAccess(false);
+      setState("idle");
       return;
     }
-
     if (user === undefined) {
-      setCheckingAccess(true);
+      setState("checking");
+      return;
+    }
+    if (!user) {
+      setState("denied");
+      router.replace("/login");
       return;
     }
 
     let cancelled = false;
-    setCheckingAccess(true);
-
-    if (!user) {
-      router.replace("/login");
-      setCheckingAccess(false);
-      return undefined;
-    }
-
-    (async () => {
-      const isAdmin = await hasAdminAccess(user);
-      if (!cancelled && !isAdmin) {
+    setState("checking");
+    hasAdminAccess(user)
+      .then(async (allowed) => {
+        if (cancelled) return;
+        if (allowed) {
+          setState("allowed");
+          return;
+        }
+        setState("denied");
         await signOut();
         router.replace("/login");
-      }
-      if (!cancelled) {
-        setCheckingAccess(false);
-      }
-    })();
+      })
+      .catch(() => {
+        if (!cancelled) setState("error");
+      });
 
     return () => {
       cancelled = true;
     };
-  }, [user, isDashboard, router, signOut]);
+  }, [attempt, isDashboard, router, signOut, user]);
 
-  if (isDashboard && (user === undefined || checkingAccess)) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0B0F15] text-white">
-        Loading...
+  if (!isDashboard) return children;
+  if (state === "allowed") return children;
+
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-surface-admin-page px-6 text-foreground">
+      <div className="max-w-md text-center" role={state === "error" ? "alert" : "status"}>
+        {state === "error" ? (
+          <>
+            <h1 className="text-2xl font-semibold">Unable to verify access</h1>
+            <p className="mt-3 text-sm leading-6 text-ink-secondary">
+              Check your connection, then try the admin verification again.
+            </p>
+            <button
+              type="button"
+              onClick={checkAccess}
+              className="mt-6 min-h-11 rounded-full bg-[#6311E1] px-6 font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#9B89FF] text-white"
+            >
+              Try again
+            </button>
+          </>
+        ) : (
+          <p>Verifying administrator access…</p>
+        )}
       </div>
-    );
-  }
-
-  return <>{children}</>;
+    </main>
+  );
 }

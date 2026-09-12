@@ -7,6 +7,7 @@ import { useAuth } from "../../context/AuthContext";
 import { FcGoogle } from "react-icons/fc";
 import { FaSpinner } from "react-icons/fa";
 import { hasAdminAccess } from "@/lib/adminAccess";
+import ThemeToggle from "@/app/components/ThemeToggle";
 
 /**
  * Catatan: Fungsionalitas TIDAK diubah — hanya styling/markup.
@@ -16,6 +17,7 @@ export default function LoginPage() {
   const router = useRouter();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -23,9 +25,11 @@ export default function LoginPage() {
     let cancelled = false;
 
     (async () => {
-      const isAdmin = await hasAdminAccess(user);
-      if (!cancelled && isAdmin) {
-        router.replace("/dashboard");
+      try {
+        const isAdmin = await hasAdminAccess(user);
+        if (!cancelled && isAdmin) router.replace("/dashboard");
+      } catch {
+        if (!cancelled) setError("Admin access could not be verified. Please try again.");
       }
     })();
 
@@ -36,6 +40,7 @@ export default function LoginPage() {
 
   const handleLogin = async () => {
     setLoading(true);
+    setError(null);
     try {
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: "select_account" });
@@ -44,19 +49,20 @@ export default function LoginPage() {
 
       if (!isAdmin) {
         await signOut(auth);
-        alert("Hanya akun admin yang diizinkan!");
+        setError("This Google account does not have administrator access.");
         return;
       }
       router.replace("/dashboard");
-    } catch (err) {
-      alert("Gagal login! Coba lagi.");
+    } catch {
+      setError("Login failed or was cancelled. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#0B0F15]">
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-surface-admin-page">
+      <div className="absolute right-6 top-6 z-20"><ThemeToggle /></div>
       {/* --- Dekorasi Latar --- */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
         {/* kabut gradien biru-ungu */}
@@ -81,13 +87,13 @@ export default function LoginPage() {
       {/* --- Card Login --- */}
       <div className="relative z-10 w-full max-w-md px-6">
         <div className="rounded-[22px] p-px bg-gradient-to-b from-[#6184DC33] via-[#6311E133] to-transparent">
-          <div className="rounded-[21px] bg-[#131320]/80 backdrop-blur-xl shadow-2xl border border-white/5">
+          <div className="theme-shadow rounded-[21px] bg-surface-section/80 backdrop-blur-xl shadow-2xl border border-contrast/5">
             {/* header */}
             <div className="px-7 pt-7 pb-4 text-center">
-              <h1 className="text-3xl md:text-4xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-[#6184DC] to-[#6311E1] drop-shadow-md">
+              <h1 className="theme-shadow text-3xl md:text-4xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-[#6184DC] to-[#6311E1] drop-shadow-md">
                 Admin Login
               </h1>
-              <p className="mt-3 text-[13px] text-gray-400">
+              <p className="mt-3 text-[13px] text-ink-secondary">
                 Administrator-only access. Make sure to use a registered Google
                 account.
               </p>
@@ -95,10 +101,12 @@ export default function LoginPage() {
 
             {/* tombol */}
             <div className="px-7 pb-7">
+              {error && <p role="alert" className="mb-4 rounded-xl border border-red-400/25 bg-red-400/10 px-4 py-3 text-sm text-red-800 dark:text-red-100">{error}</p>}
               <button
+                type="button"
                 onClick={handleLogin}
                 disabled={loading}
-                className={`group relative flex w-full items-center justify-center gap-3 rounded-xl py-3.5 px-6 text-base font-semibold text-white focus:outline-none focus-visible:ring-4 focus-visible:ring-[#6184DC]/30 transition-transform duration-200 ${
+                className={`group relative flex w-full items-center justify-center gap-3 rounded-xl py-3.5 px-6 text-base font-semibold text-foreground focus:outline-none focus-visible:ring-4 focus-visible:ring-[#6184DC]/30 transition-transform duration-200 ${
                   loading
                     ? "cursor-not-allowed"
                     : "hover:scale-[1.02] active:scale-100"
@@ -106,7 +114,7 @@ export default function LoginPage() {
               >
                 {/* gradient ring */}
                 <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#6184DC] via-[#5a5ee7] to-[#6311E1]" />
-                <span className="absolute inset-[2px] rounded-[10px] bg-[#0f1424]/80 backdrop-blur-xl" />
+                <span className="absolute inset-[2px] rounded-[10px] bg-surface-inset/80 backdrop-blur-xl" />
                 <span className="relative flex items-center gap-3">
                   <FcGoogle className="text-2xl" />
                   {loading ? (
@@ -124,7 +132,7 @@ export default function LoginPage() {
         </div>
 
         {/* footnote mini */}
-        <div className="mt-6 text-center text-[11px] text-gray-500">
+        <div className="mt-6 text-center text-[11px] text-ink-secondary">
           Only configured administrator accounts can continue.
         </div>
       </div>
@@ -156,6 +164,6 @@ export default function LoginPage() {
           animation: float-slow 12s ease-in-out infinite;
         }
       `}</style>
-    </div>
+    </main>
   );
 }

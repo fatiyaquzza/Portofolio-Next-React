@@ -1,25 +1,16 @@
 "use client";
+
 import { ScrollVelocity } from "./components/ScrollVelocity/ScrollVelocity";
 
 export default function Contact() {
   return (
-    <div className="mx-auto md:h-screen min-h-1 bg-[#131320] md:pb-0 pb-10">
-      <div className="flex justify-center items-end max-w-screen min-w-screen max-h-1/2 md:min-h-1/2 min-h-1">
-        <h1
-          className="text-white font-semibold md:text-8xl text-5xl text-center"
-          data-aos="fade-down"
-        >
-          Contact Me
-        </h1>
+    <section aria-labelledby="contact-heading" className="overflow-hidden bg-surface-section pt-24">
+      <h2 id="contact-heading" className="px-5 text-center text-5xl font-semibold text-foreground md:text-8xl" data-aos="fade-down">
+        Contact Me
+      </h2>
+      <div aria-hidden="true" className="mt-16 flex min-h-40 items-center justify-center bg-surface-marquee">
+        <ScrollVelocity texts={[{ text: "Scroll Down" }, { text: "Scroll Down" }]} velocity={80} className="text-[#131320]" />
       </div>
-
-      <div className="flex justify-center items-center max-w-screen min-w-screen max-h-1/2 md:min-h-1/2 min-h-40 bg-[#2B3045] md:pb-0">
-        <ScrollVelocity
-          texts={[{ text: "Scroll Down" }, { text: "Scroll Down" }]}
-          velocity={80}
-          className="text-[#131320]"
-        />
-      </div>
-    </div>
+    </section>
   );
 }
